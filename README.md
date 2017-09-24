@@ -1,5 +1,7 @@
 # All-in-One-VPN
-All-in-One VPN
+In progress...
+
+Support PPTP, IPSec, L2TP and OpenVPN.
 
 ## License
 
