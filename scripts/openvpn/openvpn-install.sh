@@ -364,6 +364,7 @@ crl-verify crl.pem" >> /etc/openvpn/server.conf
 		#ubuntu has exit 0 at the end of the file, remove it first.
 		sed -i -e "/^exit 0/d" $RCLOCAL	
 		cat >> $RCLOCAL <<'EOF'
+ 
 # Added by OpenVPN script
 echo 1 > /proc/sys/net/ipv4/ip_forward
 service openvpn restart

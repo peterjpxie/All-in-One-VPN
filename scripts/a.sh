@@ -1,6 +1,4 @@
-if ! grep -qs "petersvpn" /var/spool/cron/crontabs/root ; then
-echo Cannot find petersvpn
+#!/bin/sh
+echo "executing a.sh."
 
-else
-echo Found petersvpn
-fi 
+
