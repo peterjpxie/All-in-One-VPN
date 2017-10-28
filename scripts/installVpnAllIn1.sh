@@ -14,7 +14,6 @@
 #   2. Run as root.
 #   3. Files, e.g. scripts, backup are copied to local.
 
-
 # Check if current user is root
 if [ "$(id -u)" != 0 ]; then
   exiterr "Script must be run as root."
