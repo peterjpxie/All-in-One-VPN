@@ -86,3 +86,11 @@ case "$setServer_option" in
 esac
 
 fi
+
+# User management
+echo "===============================================================================
+Congrats! VPN servers are ready.
+PSK (IPSec / L2TP): petersvpn
+To create VPN users for PPTP, IPSec, L2TP, run ./manageuser.sh.
+To create VPN client profiles for OpenVPN, run ./openvpn/openvpn-install.sh.
+==============================================================================="
