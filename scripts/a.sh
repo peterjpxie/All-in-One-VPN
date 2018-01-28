@@ -1,4 +1,4 @@
 #!/bin/sh
-echo "executing a."
+echo "executing a.sh"
 
 
