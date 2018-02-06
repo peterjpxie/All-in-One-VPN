@@ -17,11 +17,12 @@ SYNOPSIS
     $0 [OPTION]
 
 DESCRIPTION	
-    -o, --option  <0|1|2>
+    -o, --option  <0|1|2|3|4>
                   0) Do all preferred VPN server settings, including option 1,
                   1) Disable root password login
                   2) Enable root password login
-
+				  3) enable root login in AWS
+                  4) enable L2TP debug			
 "
 }
 
@@ -87,12 +88,12 @@ logrotate -f /etc/logrotate.d/rsyslog
 
 }
 
-test_func() {
-echo "Test"
-if [ -z "$option2" ]; then
-echo "option2 is not defined"
-fi
-}
+#test_func() {
+#echo "Test"
+#if [ -z "$option2" ]; then
+#echo "option2 is not defined"
+#fi
+#}
 
 if [ "$option" = "" ]; then
 echo "What do you want to do?"
