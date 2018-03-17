@@ -16,7 +16,7 @@ case $option in
   echo "$username:$(openssl passwd -1 $passwd):xauth-psk" >>/etc/ipsec.d/passwd
   read -p "Push new account to US server? Y/N: " -e -i Y pushToUS
   if [ $pushToUS = 'Y' ] ; then
-  sh ~/scripts/pushVpnAcctToUS.sh
+  sh ~/All-in-One-VPN/scripts/pushVpnAcctToUS.sh
   fi
   ;;
 2) 
