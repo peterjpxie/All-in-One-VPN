@@ -14,9 +14,9 @@ case $option in
   read -p "Enter password:" -e -i $username passwd
   echo "$username * $passwd *" >>/etc/ppp/chap-secrets
   echo "$username:$(openssl passwd -1 $passwd):xauth-psk" >>/etc/ipsec.d/passwd
-  read -p "Push new account to US server? Y/N: " -e -i Y pushToUS
-  if [ $pushToUS = 'Y' ] ; then
-  sh ~/All-in-One-VPN/scripts/pushVpnAcctToUS.sh
+  read -p "Push new account to backup SG server? Y/N: " -e -i Y pushToBackup
+  if [ $pushToBackup = 'Y' ] ; then
+  sh ~/All-in-One-VPN/scripts/pushVpnAcctToSG.sh
   fi
   ;;
 2) 
