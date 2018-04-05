@@ -18,11 +18,14 @@ SYNOPSIS
 
 DESCRIPTION	
     -o, --option  <0|1|2|3|4>
-                  0) Do all preferred VPN server settings, including option 1,
-                  1) Disable root password login
-                  2) Enable root password login
-				  3) enable root login in AWS
-                  4) enable L2TP debug			
+                  0) Do all preferred VPN server settings, including option 1, 2, 4, 5...
+                  1) enable root login in AWS
+                  2) Disable root password login
+				  3) Enable root password login
+                  4) enable L2TP debug
+                  5) Configure timezone  
+				  6) Install utility packages  
+				  7) Install and configure lighttpd
 "
 }
 
@@ -65,6 +68,7 @@ passwd -u root
 # install needed packages
 install_packages(){
 apt install acct
+apt install git
 } 
 
 #Configure timezone
@@ -88,6 +92,19 @@ logrotate -f /etc/logrotate.d/rsyslog
 
 }
 
+install_lighttpd() {
+apt install lighttpd
+backup_file /etc/lighttpd/lighttpd.conf
+
+# change to: server.document-root        = "/root/Website"
+sed -i "s/^server.document-root.*/server.document-root        = \"\/root\/Website\"/" /etc/lighttpd/lighttpd.conf
+
+# disable username and password authentication
+sed -i "s/^server.username/#server.username/" /etc/lighttpd/lighttpd.conf
+sed -i "s/^server.groupname/#server.groupname/" /etc/lighttpd/lighttpd.conf
+
+}
+
 #test_func() {
 #echo "Test"
 #if [ -z "$option2" ]; then
@@ -98,26 +115,32 @@ logrotate -f /etc/logrotate.d/rsyslog
 if [ "$option" = "" ]; then
 echo "What do you want to do?"
 echo "   0) Do all preferred VPN server settings"
-echo "   1) Disable root password login"
-echo "   2) Enable root password login"
-echo "   3) Enable root login in AWS"
+echo "   1) Enable root login in AWS"
+echo "   2) Disable root password login"
+echo "   3) Enable root password login"
 echo "   4) Enable L2TP debug"
-echo "   5) Exit"
-read -p "Select an option [1-5]: " option
+echo "   5) Configure timezone"  
+echo "   6) Install utility packages"
+echo "   7) Install and configure lighttpd"
+echo "   8) Exit"
+read -p "Select an option [1-8]: " option
 fi
 		
 case $option in 
-  1) disable_root_passwd_login ;;
-  2) enable_root_passwd_login;;
-  3) enable_root_login_aws;;
+  1) enable_root_login_aws;;
+  2) disable_root_passwd_login;;
+  3) enable_root_passwd_login;;
   4) enable_L2TP_debug;;
+  5) config_tz;;
+  6) install_packages;;
+  7) install_lighttpd;;
   0) enable_root_login_aws
      disable_root_passwd_login
 	 enable_L2TP_debug
 	 config_tz
      install_packages
      ;;
-  *) exit 0;;
+  *) exit 0;;	
 esac
 
 echo "Done"
