@@ -21,11 +21,11 @@ DESCRIPTION
                   0) Do all preferred VPN server settings, including option 1, 2, 4, 5...
                   1) enable root login in AWS
                   2) Disable root password login
-				  3) Enable root password login
+		  3) Enable root password login
                   4) enable L2TP debug
                   5) Configure timezone  
-				  6) Install utility packages  
-				  7) Install and configure lighttpd
+		  6) Install utility packages  
+		  7) Install and configure lighttpd
 "
 }
 
@@ -93,7 +93,7 @@ logrotate -f /etc/logrotate.d/rsyslog
 }
 
 install_lighttpd() {
-apt install lighttpd
+apt-get -yq install lighttpd
 backup_file /etc/lighttpd/lighttpd.conf
 
 # change to: server.document-root        = "/root/Website"
@@ -102,6 +102,25 @@ sed -i "s/^server.document-root.*/server.document-root        = \"\/root\/Websit
 # disable username and password authentication
 sed -i "s/^server.username/#server.username/" /etc/lighttpd/lighttpd.conf
 sed -i "s/^server.groupname/#server.groupname/" /etc/lighttpd/lighttpd.conf
+
+# Modify iptable on bootup to allow port 80 for Webserver
+if ! grep -qs "Added by lighttpd installation script" /etc/rc.local; then
+  /bin/cp -f /etc/rc.local "/etc/rc.local.old-$sys_dt" 2>/dev/null
+
+#ubuntu has exit 0 at the end of the file.
+sed -i '/^exit 0/d' /etc/rc.local
+
+cat >> /etc/rc.local << END
+
+# Added by lighttpd installation script to allow HTTP port 80
+iptables -I INPUT -p tcp --dport 80 -j ACCEPT
+
+exit 0
+END
+
+sh /etc/rc.local
+
+fi
 
 }
 
