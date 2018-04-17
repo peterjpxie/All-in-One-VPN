@@ -1,7 +1,6 @@
 #!/bin/sh
-# Set OS for following:
-#	- Disable root password login
-# 	- 
+# Customize OS settings and install some packages.
+
 
 if [ "$(id -u)" -ne 0 ]; then
 	echo "Sorry, you need to run this as root"
@@ -21,11 +20,12 @@ DESCRIPTION
                   0) Do all preferred VPN server settings, including option 1, 2, 4, 5...
                   1) enable root login in AWS
                   2) Disable root password login
-		  3) Enable root password login
+                  3) Enable root password login
                   4) enable L2TP debug
                   5) Configure timezone  
-		  6) Install utility packages  
-		  7) Install and configure lighttpd
+                  6) Install utility packages  
+                  7) Install and configure lighttpd
+				  8) Miscellaneous settings
 "
 }
 
@@ -124,12 +124,11 @@ fi
 
 }
 
-#test_func() {
-#echo "Test"
-#if [ -z "$option2" ]; then
-#echo "option2 is not defined"
-#fi
-#}
+misc_settings() {
+# change vi color scheme to ron. 
+echo "colorscheme ron" > /root/.vimrc
+
+}
 
 if [ "$option" = "" ]; then
 echo "What do you want to do?"
@@ -141,8 +140,9 @@ echo "   4) Enable L2TP debug"
 echo "   5) Configure timezone"  
 echo "   6) Install utility packages"
 echo "   7) Install and configure lighttpd"
-echo "   8) Exit"
-read -p "Select an option [1-8]: " option
+echo "   8) Miscellaneous settings"
+echo "   99) Exit"
+read -p "Select an option: " option
 fi
 		
 case $option in 
@@ -153,11 +153,14 @@ case $option in
   5) config_tz;;
   6) install_packages;;
   7) install_lighttpd;;
+  8) misc_settings;;
   0) enable_root_login_aws
      disable_root_passwd_login
 	 enable_L2TP_debug
 	 config_tz
      install_packages
+	 install_lighttpd
+	 misc_settings
      ;;
   *) exit 0;;	
 esac
