@@ -14,6 +14,8 @@
 #   2. Run as root.
 #   3. Files, e.g. scripts, backup are copied to local.
 
+exiterr()  { echo "Error: ${1}" >&2; exit 1; }
+
 # Check if current user is root
 if [ "$(id -u)" != 0 ]; then
   exiterr "Script must be run as root."
@@ -31,7 +33,7 @@ DESCRIPTION
 "
 }
 
-# Read parameters
+# Read arguments
 while [ "$1" != "" ]; do
   case "$1" in
     -o    | --option )             option=$2; shift 2 ;;

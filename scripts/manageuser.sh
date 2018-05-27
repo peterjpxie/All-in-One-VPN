@@ -1,4 +1,76 @@
 #!/bin/bash
+
+printhelp() {
+echo "
+SYNOPSIS
+    $0 [OPTIONS] [-u <username>] [-p <password>]
+
+DESCRIPTION
+    Manage VPN users. If no options specified, it will prompt the options to users.
+
+[OPTIONS]	
+    -a, --add    <username> Add user with -u username and -p password
+    -d, --delete <username> Delete user with -u username
+"
+}
+
+addUser() {
+if [ "$1" = "" ] || [ "$2" = "" ]; then
+echo "addUser(): Invalid arguments."; exit 1;
+fi
+
+username=$1
+passwd=$2
+# pushToBackupSvr=$3
+
+echo "$username * $passwd *" >>/etc/ppp/chap-secrets
+echo "$username:$(openssl passwd -1 $passwd):xauth-psk" >>/etc/ipsec.d/passwd
+# read -p "Push new account to backup SG server? Y/N: " -e -i Y pushToBackup
+#if [ "$pushToBackupSvr" = 'Y' ] ; then
+sh ~/All-in-One-VPN/scripts/pushVpnAcctToSG.sh
+#fi
+
+}
+
+deleteUser() {
+if [ "$1" = "" ]; then
+echo "deleteUser(): Invalid arguments."; exit 1;
+fi
+
+username=$1
+
+echo "Deleting user $username ..."
+sed -i "/^$username/d" /etc/ppp/chap-secrets
+sed -i "/^$username/d" /etc/ipsec.d/passwd
+}
+
+option=""
+
+# Read arguments
+while [ "$1" != "" ]; do
+  case "$1" in
+    -a    | --add    )          option=1; shift 1 ;;
+	-d    | --delete )          option=2; shift 1 ;;
+    -u               )          username=$2; shift 2 ;;
+    -p               )          password=$2; shift 2 ;;
+    -h    | --help  | *)        printhelp; exit 0 ;;	
+  esac
+done
+
+exit_done(){
+echo "Done."
+exit 0
+}
+
+if [ "$option" = '1' ]; then
+addUser $username $password; exit_done;
+fi
+
+if [ "$option" = '2' ]; then
+deleteUser $username; exit_done;
+fi
+
+run_w_prompt() {
 echo "
 What do you want to do?
 1) Add a user
@@ -12,12 +84,13 @@ case $option in
   exit 0
   fi
   read -p "Enter password:" -e -i $username passwd
-  echo "$username * $passwd *" >>/etc/ppp/chap-secrets
-  echo "$username:$(openssl passwd -1 $passwd):xauth-psk" >>/etc/ipsec.d/passwd
-  read -p "Push new account to backup SG server? Y/N: " -e -i Y pushToBackup
-  if [ $pushToBackup = 'Y' ] ; then
-  sh ~/All-in-One-VPN/scripts/pushVpnAcctToSG.sh
-  fi
+  addUser $username $passwd
+#  echo "$username * $passwd *" >>/etc/ppp/chap-secrets
+#  echo "$username:$(openssl passwd -1 $passwd):xauth-psk" >>/etc/ipsec.d/passwd
+#  read -p "Push new account to backup SG server? Y/N: " -e -i Y pushToBackup
+#  if [ $pushToBackup = 'Y' ] ; then
+#  sh ~/All-in-One-VPN/scripts/pushVpnAcctToSG.sh
+#  fi
   ;;
 2) 
   read -p "Enter username or keyword:" username
@@ -41,10 +114,10 @@ case $option in
   read -p "Select one user to delete [1-$matched_lines]:" username_no
   fi
   full_username=`grep $username /etc/ppp/chap-secrets | grep -v "^#" | cut -f 1 -d " " | sed -n "$username_no"p`
-  
-  echo "Deleting user $full_username ..."
-  sed -i "/^$full_username/d" /etc/ppp/chap-secrets
-  sed -i "/^$full_username/d" /etc/ipsec.d/passwd
+  deleteUser $full_username
+#  echo "Deleting user $full_username ..."
+#  sed -i "/^$full_username/d" /etc/ppp/chap-secrets
+#  sed -i "/^$full_username/d" /etc/ipsec.d/passwd
   ;;
 *) 
   echo "Invalid option. Exiting..."
@@ -52,3 +125,6 @@ case $option in
   ;;
 esac
 echo "Done."
+}
+
+run_w_prompt;
