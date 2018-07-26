@@ -1,4 +1,5 @@
 |- syslog is not logging
+Solution:
 service rsyslog restart
 or
 dpkg-reconfigure rsyslog
