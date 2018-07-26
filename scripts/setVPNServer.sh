@@ -129,7 +129,7 @@ fi
 
 misc_settings() {
 
-echo "Changing default editor and vi settings, please re-login to take changes effective."
+echo "Changing default editor and vi settings... please re-login to take changes effective."
 # change vi color scheme to ron. 
 echo "colorscheme ron" > ~/.vimrc
 
