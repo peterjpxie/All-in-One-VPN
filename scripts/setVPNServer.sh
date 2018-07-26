@@ -128,8 +128,18 @@ fi
 }
 
 misc_settings() {
+
+echo "Changing default editor and vi settings, please re-login to take changes effective."
 # change vi color scheme to ron. 
-echo "colorscheme ron" > /root/.vimrc
+echo "colorscheme ron" > ~/.vimrc
+
+# Change default editor to vi
+echo "
+# Customised settings - Peter Xie
+export EDITOR=vi
+" >> ~/.bashrc
+#. ~/.bashrc
+
 
 }
 
