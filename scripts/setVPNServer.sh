@@ -103,6 +103,9 @@ sed -i "s/^server.document-root.*/server.document-root        = \"\/root\/Websit
 sed -i "s/^server.username/#server.username/" /etc/lighttpd/lighttpd.conf
 sed -i "s/^server.groupname/#server.groupname/" /etc/lighttpd/lighttpd.conf
 
+# restart lighttpd to consume new configuration changes
+service lighttpd restart
+
 # Modify iptable on bootup to allow port 80 for Webserver
 if ! grep -qs "Added by lighttpd installation script" /etc/rc.local; then
   /bin/cp -f /etc/rc.local "/etc/rc.local.old-$sys_dt" 2>/dev/null
