@@ -16,7 +16,7 @@ fi
 # return $exitPing
 # }
 
-dstServer="sg.petersvpn.com"
+dstServer="au.petersvpn.com"
 checkIfHostAlive $dstServer
 ret=$?
 # echo "$dstServer ret is $ret"
