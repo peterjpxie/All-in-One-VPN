@@ -38,7 +38,7 @@ if ! grep -qs "Added by tinyproxy installation script" /etc/rc.local; then
 iptables -I INPUT -p tcp --dport 8888 -j ACCEPT
 
 exit 0
-" >> rc.local
+" >> /etc/rc.local
   
   sh /etc/rc.local
 
