@@ -63,6 +63,7 @@ apt-get -y install pptpd || {
   exit 1
 }
 
+sys_dt="$(date +%Y-%m-%d-%H:%M:%S)"
 # Update iptables and start PPTP service on bootup
 if ! grep -qs "Added by PPTP VPN script" /etc/rc.local; then
   /bin/cp -f /etc/rc.local "/etc/rc.local.old-$sys_dt" 2>/dev/null
