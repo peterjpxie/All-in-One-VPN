@@ -34,8 +34,7 @@ if ! grep -qs "Added by tinyproxy installation script" /etc/rc.local; then
   sed -i '/^exit 0/d' /etc/rc.local
   
   echo "
-# Added by tinyproxy installation script 
-service tinyproxy start
+# Added by tinyproxy installation script
 iptables -I INPUT -p tcp --dport 8888 -j ACCEPT
 
 exit 0
