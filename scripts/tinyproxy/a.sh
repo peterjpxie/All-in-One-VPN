@@ -17,18 +17,11 @@ then
   exit 0
 fi
 
-# apt update
-apt -y install tinyproxy || {
-  echo "Could not install tinyproxy" 
-  exit 1
-}
+
 
 # Replace port
 sed -i "s/^Port 8888/Port $proxyPort/" /etc/tinyproxy.conf
 
-# Allow connections from all IP addresses
-# Add: Allow 0.0.0.0/0
-sed -i 's/^Allow 127.0.0.1/Allow 127.0.0.1\nAllow 0.0.0.0\/0/' /etc/tinyproxy.conf
 service tinyproxy restart
 
 sys_dt="$(date +%Y-%m-%d-%H:%M:%S)"
