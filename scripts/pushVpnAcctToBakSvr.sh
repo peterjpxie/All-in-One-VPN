@@ -1,22 +1,17 @@
 #!/bin/sh
-# Push to sg.petersvpn.com: chap-secrets and ipsec/passwd
+# Push to backup server: chap-secrets and ipsec/passwd
+
+if [ "$1" = "" ]; then
+dstServer="g.petersvpn.com"
+else
+# echo argument is $1
+dstServer=$1
+fi
 
 if [ -f ~/All-in-One-VPN/scripts/utilsPX.sh ] ; then
 . ~/All-in-One-VPN/scripts/utilsPX.sh
 fi
-# checkIfHostAlive() {
-# if [ $1 = "" ]; then
-# echo "Function $0: Invalid calling - No hostname argument."
-# return 9
-# fi
-# 
-# host=$1
-# ping -c 1 -W 1 $host
-# exitPing=$?
-# return $exitPing
-# }
 
-dstServer="au.petersvpn.com"
 checkIfHostAlive $dstServer
 ret=$?
 # echo "$dstServer ret is $ret"

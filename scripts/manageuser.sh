@@ -21,13 +21,14 @@ fi
 
 username=$1
 passwd=$2
-# pushToBackupSvr=$3
+# BackupSvr=$3
+BackupSvr="g.petersvpn.com"
 
 echo "$username * $passwd *" >>/etc/ppp/chap-secrets
 echo "$username:$(openssl passwd -1 $passwd):xauth-psk" >>/etc/ipsec.d/passwd
 # read -p "Push new account to backup SG server? Y/N: " -e -i Y pushToBackup
 #if [ "$pushToBackupSvr" = 'Y' ] ; then
-sh ~/All-in-One-VPN/scripts/pushVpnAcctToSG.sh
+sh ~/All-in-One-VPN/scripts/pushVpnAcctToBakSvr.sh $BackupSvr
 #fi
 
 }
