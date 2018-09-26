@@ -3,6 +3,10 @@ One script to install all VPN applications: PPTP, IPSec, L2TP, OpenVPN, Tinyprox
 
 Check [wiki](https://github.com/peterjpxie/All-in-One-VPN/wiki) for details.
 
+## Firewall Settings
+* IPSec / L2TP: UDP 500, 4500, 1701
+* PPTP:         TCP 1723
+
   
 
 
