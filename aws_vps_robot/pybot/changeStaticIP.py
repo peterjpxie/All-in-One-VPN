@@ -13,19 +13,22 @@ DEBUG_OPTION=1
 # Application Parameters 
 vInstanceName = 'Ubuntu-1GB-Oregon-1'
 vStaticIpName = 'StaticIp-Oregon-Auto'
+vHostedZoneId = '/hostedzone/Z2ZVCN3CYRFI7N'
+vDNS_name = 'usw.petersvpn.com'
 
 
 # boto3.setup_default_session(region_name='us-west-2')
 cur_dt = datetime.now().strftime('%Y-%m-%d_%H-%M-%S')
 # lsclient = boto3.client('lightsail')
 lsclient = boto3.client('lightsail', region_name='us-west-2')
+rtclient = boto3.client('route53')
 
 def debugLog(logString):
     if DEBUG_OPTION:
         print (logString)
 
 def writeFile(filename, strText):
-    f = open(filename,"w") # nuke or create the file !
+    f = open(filename,'w') # nuke or create the file !
     f.write(strText)
     f.close()
 
@@ -108,8 +111,91 @@ def releaseStaticIp( vStaticIpName_):
         if (str(release_static_ip_resp['ResponseMetadata']['HTTPStatusCode']) == '200' and
             str(release_static_ip_resp['operations'][0]['status']) == 'Succeeded'):
             debugLog ( 'StaticIp is released: ' + release_static_ip_resp['operations'][0]['resourceName'] )
+
+# Release the old static IP
+def changeDNS( vHostedZoneId_, vDNS_name_, vIpAddress_):
+    
+    change_resource_record_sets_resp = ''
+    try:
+        change_resource_record_sets_resp = rtclient.change_resource_record_sets(
+            HostedZoneId = vHostedZoneId_,
+            ChangeBatch={
+                'Comment': 'change DNS A record',
+                'Changes': [
+                    {
+                        'Action': 'UPSERT',
+                        'ResourceRecordSet': {
+                            'Name': vDNS_name_,
+                            'Type': 'A',
+                            'TTL': 300,
+                            'ResourceRecords': [
+                                {
+                                    'Value': vIpAddress_
+                                }
+                            ]
+                        }
+                    }
+                ]
+            }
+        ) 
+        
+    except Exception as ex:
+        print('Call to change_resource_record_sets failed with exception as below:') 
+        print(ex)
+    
+    debugLog (change_resource_record_sets_resp)
+ 
+'''
+    if release_static_ip_resp != '':
+        if (str(release_static_ip_resp['ResponseMetadata']['HTTPStatusCode']) == '200' and
+            str(release_static_ip_resp['operations'][0]['status']) == 'Succeeded'):
+            debugLog ( 'StaticIp is released: ' + release_static_ip_resp['operations'][0]['resourceName'] )
+ 
+'''
+
+''' 
+    response = client.change_resource_record_sets(
+        HostedZoneId='string',
+        ChangeBatch={
+            'Comment': 'string',
+            'Changes': [
+                {
+                    'Action': 'CREATE'|'DELETE'|'UPSERT',
+                    'ResourceRecordSet': {
+                        'Name': 'string',
+                        'Type': 'SOA'|'A'|'TXT'|'NS'|'CNAME'|'MX'|'NAPTR'|'PTR'|'SRV'|'SPF'|'AAAA'|'CAA',
+                        'SetIdentifier': 'string',
+                        'Weight': 123,
+                        'Region': 'us-east-1'|'us-east-2'|'us-west-1'|'us-west-2'|'ca-central-1'|'eu-west-1'|'eu-west-2'|'eu-west-3'|'eu-central-1'|'ap-southeast-1'|'ap-southeast-2'|'ap-northeast-1'|'ap-northeast-2'|'ap-northeast-3'|'sa-east-1'|'cn-north-1'|'cn-northwest-1'|'ap-south-1',
+                        'GeoLocation': {
+                            'ContinentCode': 'string',
+                            'CountryCode': 'string',
+                            'SubdivisionCode': 'string'
+                        },
+                        'Failover': 'PRIMARY'|'SECONDARY',
+                        'MultiValueAnswer': True|False,
+                        'TTL': 123,
+                        'ResourceRecords': [
+                            {
+                                'Value': 'string'
+                            },
+                        ],
+                        'AliasTarget': {
+                            'HostedZoneId': 'string',
+                            'DNSName': 'string',
+                            'EvaluateTargetHealth': True|False
+                        },
+                        'HealthCheckId': 'string',
+                        'TrafficPolicyInstanceId': 'string'
+                    }
+                },
+            ]
+        }
+    )            
+'''
             
 def main():
+    '''
     debugLog ('\n*****Static IP before relocation:****')
     getStaticIp(vStaticIpName)
     debugLog ('')
@@ -118,8 +204,11 @@ def main():
     attachStaticIp(vStaticIpName, vInstanceName)
     debugLog ('\n*****Static IP after relocation:****')
     getStaticIp(vStaticIpName)
+    '''
     
-if __name__ == "__main__":
+    changeDNS( vHostedZoneId, vDNS_name, '52.40.255.188')
+    
+if __name__ == '__main__':
     main();
     
         
@@ -134,4 +223,8 @@ aws lightsail get-static-ips
 aws lightsail get-static-ip --static-ip-name StaticIp-Oregon-New
 aws lightsail release-static-ip --static-ip-name StaticIp-Oregon-2
 aws lightsail get-static-ips
+
+aws route53 list-hosted-zones 
+aws route53 change-resource-record-sets --hosted-zone-id /hostedzone/Z2ZVCN3CYRFI7N --change-batch file://update_A_record.json
+aws route53 list-resource-record-sets --hosted-zone-id /hostedzone/Z2ZVCN3CYRFI7N
 '''
