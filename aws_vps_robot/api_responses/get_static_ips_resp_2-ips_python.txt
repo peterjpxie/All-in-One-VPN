@@ -1,0 +1,57 @@
+{
+	'ResponseMetadata': {
+		'HTTPStatusCode': 200,
+		'HTTPHeaders': {
+			'server': 'Server',
+			'connection': 'keep-alive',
+			'content-type': 'application/x-amz-json-1.1',
+			'x-amzn-requestid': '01d77c92-cf76-11e8-9753-d500730ce746',
+			'content-length': '722',
+			'date': 'Sun,
+			14Oct201805: 57: 18GMT'
+		},
+		'RetryAttempts': 0,
+		'RequestId': '01d77c92-cf76-11e8-9753-d500730ce746'
+	},
+	'staticIps': [{
+		'supportCode': '755277112345/35.160.105.238',
+		'name': 'StaticIp-Oregon-New',
+		'attachedTo': 'Ubuntu-1GB-Oregon-1',
+		'createdAt': datetime.datetime(2018,
+		10,
+		8,
+		12,
+		57,
+		26,
+		134000,
+		tzinfo=tzlocal()),
+		'ipAddress': '35.160.105.238',
+		'arn': 'arn: aws: lightsail: us-west-2: 385428905085: StaticIp/144faa63-d2af-4cd8-8da9-2d23a405a95f',
+		'resourceType': 'StaticIp',
+		'isAttached': True,
+		'location': {
+			'regionName': 'us-west-2',
+			'availabilityZone': 'all'
+		}
+	},
+	{
+		'supportCode': '755277112345/34.208.148.232',
+		'name': 'StaticIp-Oregon-New2',
+		'createdAt': datetime.datetime(2018,
+		10,
+		14,
+		16,
+		29,
+		50,
+		605000,
+		tzinfo=tzlocal()),
+		'ipAddress': '34.208.148.232',
+		'arn': 'arn: aws: lightsail: us-west-2: 385428905085: StaticIp/ab07f228-7085-44c1-8111-56a5c7c1f6b1',
+		'resourceType': 'StaticIp',
+		'isAttached': False,
+		'location': {
+			'regionName': 'us-west-2',
+			'availabilityZone': 'all'
+		}
+	}]
+}

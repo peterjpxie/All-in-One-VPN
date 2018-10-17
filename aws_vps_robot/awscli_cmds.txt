@@ -1,0 +1,16 @@
+aws route53 list-hosted-zones    # Get the  hosted-zone-id 
+aws route53 change-resource-record-sets --hosted-zone-id /hostedzone/Z2ZVCN3CYRFI7N --change-batch file://update_A_record.json
+aws route53 list-resource-record-sets --hosted-zone-id /hostedzone/Z2ZVCN3CYRFI7N
+aws ec2 describe-regions --output table
+aws lightsail get-instances
+
+aws lightsail allocate-static-ip --static-ip-name StaticIp-Oregon-New
+aws lightsail detach-static-ip --static-ip-name StaticIp-Oregon-2
+aws lightsail get-static-ips
+aws lightsail get-instances
+aws lightsail get-instance --instance-name Ubuntu-1GB-Oregon-1
+aws lightsail attach-static-ip --static-ip-name StaticIp-Oregon-New --instance-name Ubuntu-1GB-Oregon-1
+aws lightsail get-static-ips
+aws lightsail get-static-ip --static-ip-name StaticIp-Oregon-New
+aws lightsail release-static-ip --static-ip-name StaticIp-Oregon-2
+aws lightsail get-static-ips

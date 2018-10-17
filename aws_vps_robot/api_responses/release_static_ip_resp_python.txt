@@ -1,0 +1,102 @@
+{
+	'ResponseMetadata': {
+		'RetryAttempts': 0,
+		'HTTPStatusCode': 200,
+		'HTTPHeaders': {
+			'x-amzn-requestid': 'bdcd29cb-d1c2-11e8-8656-5f30e1b6a482',
+			'content-type': 'application/x-amz-json-1.1',
+			'date': 'Wed,
+			17Oct201804: 11: 38GMT',
+			'server': 'Server',
+			'connection': 'keep-alive',
+			'content-length': '1030'
+		},
+		'RequestId': 'bdcd29cb-d1c2-11e8-8656-5f30e1b6a482'
+	},
+	'operations': [{
+		'resourceName': 'StaticIp-Oregon-New',
+		'id': '437cf0d3-dad3-48a8-9f58-694057159ef3',
+		'isTerminal': True,
+		'createdAt': datetime.datetime(2018,
+		10,
+		17,
+		15,
+		11,
+		38,
+		418000,
+		tzinfo=tzlocal()),
+		'operationDetails': 'Ubuntu-1GB-Oregon-1',
+		'status': 'Succeeded',
+		'location': {
+			'regionName': 'us-west-2',
+			'availabilityZone': 'all'
+		},
+		'statusChangedAt': datetime.datetime(2018,
+		10,
+		17,
+		15,
+		11,
+		38,
+		418000,
+		tzinfo=tzlocal()),
+		'resourceType': 'StaticIp',
+		'operationType': 'DetachStaticIp'
+	},
+	{
+		'resourceName': 'Ubuntu-1GB-Oregon-1',
+		'id': '84de5db6-24ad-45c4-8e07-b30f8410f7a1',
+		'isTerminal': True,
+		'createdAt': datetime.datetime(2018,
+		10,
+		17,
+		15,
+		11,
+		38,
+		413000,
+		tzinfo=tzlocal()),
+		'operationDetails': 'StaticIp-Oregon-New',
+		'status': 'Succeeded',
+		'location': {
+			'regionName': 'us-west-2',
+			'availabilityZone': 'us-west-2a'
+		},
+		'statusChangedAt': datetime.datetime(2018,
+		10,
+		17,
+		15,
+		11,
+		38,
+		413000,
+		tzinfo=tzlocal()),
+		'resourceType': 'Instance',
+		'operationType': 'DetachStaticIp'
+	},
+	{
+		'resourceName': 'StaticIp-Oregon-New',
+		'id': 'c9a29140-b7c1-4549-b2d0-c896c323d999',
+		'isTerminal': True,
+		'createdAt': datetime.datetime(2018,
+		10,
+		17,
+		15,
+		11,
+		38,
+		758000,
+		tzinfo=tzlocal()),
+		'status': 'Succeeded',
+		'location': {
+			'regionName': 'us-west-2',
+			'availabilityZone': 'all'
+		},
+		'statusChangedAt': datetime.datetime(2018,
+		10,
+		17,
+		15,
+		11,
+		38,
+		758000,
+		tzinfo=tzlocal()),
+		'resourceType': 'StaticIp',
+		'operationType': 'ReleaseStaticIp'
+	}]
+}

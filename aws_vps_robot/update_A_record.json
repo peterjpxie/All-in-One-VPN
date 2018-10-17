@@ -1,0 +1,18 @@
+{
+  "Comment": "",
+  "Changes": [
+    {
+      "Action": "UPSERT",
+      "ResourceRecordSet": {
+        "Name": "usw.petersvpn.com",
+        "Type": "A",
+        "TTL": 300,
+        "ResourceRecords": [
+          {
+            "Value": "35.160.105.238"
+          }
+        ]
+      }
+    }
+  ]
+}

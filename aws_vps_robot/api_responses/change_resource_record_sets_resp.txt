@@ -1,0 +1,27 @@
+{
+	'ResponseMetadata': {
+		'RetryAttempts': 0,
+		'HTTPHeaders': {
+			'x-amzn-requestid': '0d2d6cab-d1d5-11e8-99c5-531026d7bf74',
+			'content-type': 'text/xml',
+			'date': 'Wed,
+			17Oct201806: 22: 40GMT',
+			'content-length': '314'
+		},
+		'HTTPStatusCode': 200,
+		'RequestId': '0d2d6cab-d1d5-11e8-99c5-531026d7bf74'
+	},
+	'ChangeInfo': {
+		'Status': 'PENDING',
+		'Id': '/change/C1FT7OSVQ41DSG',
+		'Comment': 'changeDNSArecord',
+		'SubmittedAt': datetime.datetime(2018,
+		10,
+		17,
+		6,
+		22,
+		41,
+		447000,
+		tzinfo=tzutc())
+	}
+}

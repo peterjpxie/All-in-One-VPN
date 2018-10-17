@@ -1,0 +1,44 @@
+{
+	'ResponseMetadata': {
+		'RetryAttempts': 0,
+		'RequestId': 'b32d762f-d12b-11e8-8656-5f30e1b6a482',
+		'HTTPHeaders': {
+			'content-type': 'application/x-amz-json-1.1',
+			'date': 'Tue,
+			16Oct201810: 10: 26GMT',
+			'x-amzn-requestid': 'b32d762f-d12b-11e8-8656-5f30e1b6a482',
+			'server': 'Server',
+			'connection': 'keep-alive',
+			'content-length': '327'
+		},
+		'HTTPStatusCode': 200
+	},
+	'operations': [{
+		'createdAt': datetime.datetime(2018,
+		10,
+		16,
+		21,
+		10,
+		25,
+		556000,
+		tzinfo=tzlocal()),
+		'status': 'Succeeded',
+		'resourceType': 'StaticIp',
+		'resourceName': 'StaticIp-Oregon-Auto',
+		'location': {
+			'regionName': 'us-west-2',
+			'availabilityZone': 'all'
+		},
+		'id': 'c2f3e4e6-8ea8-422f-91a8-f277a9e9da17',
+		'isTerminal': True,
+		'statusChangedAt': datetime.datetime(2018,
+		10,
+		16,
+		21,
+		10,
+		26,
+		83000,
+		tzinfo=tzlocal()),
+		'operationType': 'AllocateStaticIp'
+	}]
+}

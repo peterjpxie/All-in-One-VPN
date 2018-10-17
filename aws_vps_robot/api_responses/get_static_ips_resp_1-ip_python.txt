@@ -1,0 +1,37 @@
+{
+	'ResponseMetadata': {
+		'RequestId': '04435bd9-cf4b-11e8-9753-d500730ce746',
+		'RetryAttempts': 0,
+		'HTTPStatusCode': 200,
+		'HTTPHeaders': {
+			'content-type': 'application/x-amz-json-1.1',
+			'x-amzn-requestid': '04435bd9-cf4b-11e8-9753-d500730ce746',
+			'server': 'Server',
+			'content-length': '385',
+			'date': 'Sun,
+			14Oct201800: 49: 33GMT',
+			'connection': 'keep-alive'
+		}
+	},
+	'staticIps': [{
+		'attachedTo': 'Ubuntu-1GB-Oregon-1',
+		'supportCode': '755277112345/35.160.105.238',
+		'ipAddress': '35.160.105.238',
+		'resourceType': 'StaticIp',
+		'isAttached': True,
+		'createdAt': datetime.datetime(2018,
+		10,
+		8,
+		12,
+		57,
+		26,
+		134000,
+		tzinfo=tzlocal()),
+		'name': 'StaticIp-Oregon-New',
+		'location': {
+			'availabilityZone': 'all',
+			'regionName': 'us-west-2'
+		},
+		'arn': 'arn: aws: lightsail: us-west-2: 385428905085: StaticIp/144faa63-d2af-4cd8-8da9-2d23a405a95f'
+	}]
+}

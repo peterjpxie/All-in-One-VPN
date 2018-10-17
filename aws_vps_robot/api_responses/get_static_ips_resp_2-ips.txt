@@ -1,0 +1,32 @@
+{
+    "staticIps": [
+        {
+            "name": "StaticIp-Oregon-New",
+            "location": {
+                "regionName": "us-west-2",
+                "availabilityZone": "all"
+            },
+            "isAttached": true,
+            "createdAt": 1538963846.134,
+            "supportCode": "755277112345/35.160.105.238",
+            "resourceType": "StaticIp",
+            "arn": "arn:aws:lightsail:us-west-2:385428905085:StaticIp/144faa63-d2af-4cd8-8da9-2d23a405a95f",
+            "ipAddress": "35.160.105.238",
+            "attachedTo": "Ubuntu-1GB-Oregon-1"
+        },
+        {
+            "name": "StaticIp-Oregon-New2",
+            "location": {
+                "regionName": "us-west-2",
+                "availabilityZone": "all"
+            },
+            "isAttached": false,
+            "createdAt": 1539494990.605,
+            "supportCode": "755277112345/34.208.148.232",
+            "resourceType": "StaticIp",
+            "arn": "arn:aws:lightsail:us-west-2:385428905085:StaticIp/ab07f228-7085-44c1-8111-56a5c7c1f6b1",
+            "ipAddress": "34.208.148.232"
+        }
+    ]
+}
+

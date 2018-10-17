@@ -1,0 +1,74 @@
+{
+	'operations': [{
+		'resourceType': 'StaticIp',
+		'status': 'Succeeded',
+		'location': {
+			'regionName': 'us-west-2',
+			'availabilityZone': 'all'
+		},
+		'isTerminal': True,
+		'statusChangedAt': datetime.datetime(2018,
+		10,
+		17,
+		15,
+		43,
+		51,
+		242000,
+		tzinfo=tzlocal()),
+		'resourceName': 'StaticIp-Oregon-Auto',
+		'createdAt': datetime.datetime(2018,
+		10,
+		17,
+		15,
+		43,
+		51,
+		242000,
+		tzinfo=tzlocal()),
+		'operationDetails': 'Ubuntu-1GB-Oregon-1',
+		'id': 'f7c9a05d-c364-4166-848a-523c6dfeb972',
+		'operationType': 'AttachStaticIp'
+	},
+	{
+		'resourceType': 'Instance',
+		'status': 'Succeeded',
+		'location': {
+			'regionName': 'us-west-2',
+			'availabilityZone': 'us-west-2a'
+		},
+		'isTerminal': True,
+		'statusChangedAt': datetime.datetime(2018,
+		10,
+		17,
+		15,
+		43,
+		51,
+		266000,
+		tzinfo=tzlocal()),
+		'resourceName': 'Ubuntu-1GB-Oregon-1',
+		'createdAt': datetime.datetime(2018,
+		10,
+		17,
+		15,
+		43,
+		51,
+		266000,
+		tzinfo=tzlocal()),
+		'operationDetails': 'StaticIp-Oregon-Auto',
+		'id': '9e5f7fa8-b10c-4677-9aca-6d5da2a4a7b9',
+		'operationType': 'AttachStaticIp'
+	}],
+	'ResponseMetadata': {
+		'RetryAttempts': 0,
+		'HTTPHeaders': {
+			'content-type': 'application/x-amz-json-1.1',
+			'content-length': '723',
+			'x-amzn-requestid': '3de6e8b4-d1c7-11e8-a3cb-9d2fb6db47c7',
+			'date': 'Wed,
+			17Oct201804: 43: 51GMT',
+			'server': 'Server',
+			'connection': 'keep-alive'
+		},
+		'RequestId': '3de6e8b4-d1c7-11e8-a3cb-9d2fb6db47c7',
+		'HTTPStatusCode': 200
+	}
+}
