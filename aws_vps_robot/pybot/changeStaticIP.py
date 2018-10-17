@@ -1,5 +1,137 @@
-import boto3
+'''
+Change Static IP for Lightsail VPS automatically
+'''
+# Indent: 4 spaces (Enable tab for 4 spaces in Notepad++ in settings/Preferenes/Languages )
 
-client = boto3.client('lightsail')
-response = client.get_static_ips()
-print(response)
+import boto3
+import json
+from datetime import datetime, time, date
+
+# Parameters
+DEBUG_OPTION=1
+
+# Application Parameters 
+vInstanceName = 'Ubuntu-1GB-Oregon-1'
+vStaticIpName = 'StaticIp-Oregon-Auto'
+
+
+# boto3.setup_default_session(region_name='us-west-2')
+cur_dt = datetime.now().strftime('%Y-%m-%d_%H-%M-%S')
+# lsclient = boto3.client('lightsail')
+lsclient = boto3.client('lightsail', region_name='us-west-2')
+
+def debugLog(logString):
+    if DEBUG_OPTION:
+        print (logString)
+
+def writeFile(filename, strText):
+    f = open(filename,"w") # nuke or create the file !
+    f.write(strText)
+    f.close()
+
+def getStaticIp(vStaticIpName_):
+    static_ip_response = ''
+    try: 
+        static_ip_response = lsclient.get_static_ip( 
+        # staticIpName = 'StaticIp-Oregon-New' 
+        staticIpName = vStaticIpName_
+        )
+    except Exception as ex:
+        print('Call to get_static_ip failed with exception as below:') 
+        print(ex)
+    
+    #debugLog (static_ip_response)
+    if static_ip_response != '':
+        if str(static_ip_response['ResponseMetadata']['HTTPStatusCode']) == '200':
+            debugLog ( 'staticIp name: ' + static_ip_response['staticIp']['name'] )
+            debugLog ( 'staticIp ipAddress: ' + static_ip_response['staticIp']['ipAddress'] )
+            debugLog ( 'Attached to: ' + static_ip_response['staticIp']['attachedTo'] ) 
+
+def getStaticIps():            
+    static_ips_response = lsclient.get_static_ips()
+    print ( 'static_ips_response:\n',static_ips_response )
+    
+# Allocate a new static IP
+def allocateStaticIp( vStaticIpName_ ):
+    allocate_static_ip_resp = ''
+    try:
+        allocate_static_ip_resp = lsclient.allocate_static_ip(
+            staticIpName = vStaticIpName_ 
+        )
+    except Exception as ex:
+        print('Call to allocate_static_ip failed with exception as below:') 
+        print(ex)
+    
+    # debugLog (allocate_static_ip_resp)
+    
+    if allocate_static_ip_resp != '':
+        if (str(allocate_static_ip_resp['ResponseMetadata']['HTTPStatusCode']) == '200' and
+            str(allocate_static_ip_resp['operations'][0]['status']) == 'Succeeded'):
+            # debugLog ( 'region Name: ' + allocate_static_ip_resp['operations'][0]['location']['regionName'] )
+            debugLog ( 'StaticIp is created: ' + allocate_static_ip_resp['operations'][0]['resourceName'] )
+
+# Attach a new static IP
+def attachStaticIp( vStaticIpName_, vInstanceName_):            
+    attach_static_ip_resp = ''
+    try:
+        attach_static_ip_resp = lsclient.attach_static_ip(
+            staticIpName = vStaticIpName_,
+            instanceName = vInstanceName_ 
+        )
+    except Exception as ex:
+        print('Call to attach_static_ip failed with exception as below:') 
+        print(ex)
+    
+    # debugLog (attach_static_ip_resp)
+
+    if attach_static_ip_resp != '':
+        if (str(attach_static_ip_resp['ResponseMetadata']['HTTPStatusCode']) == '200' and
+            str(attach_static_ip_resp['operations'][0]['status']) == 'Succeeded'):
+            # debugLog ( 'region Name: ' + allocate_static_ip_resp['operations'][0]['location']['regionName'] )
+            debugLog ( 'StaticIp is attached to: ' + attach_static_ip_resp['operations'][0]['operationDetails'] )
+
+            
+# Release the old static IP
+def releaseStaticIp( vStaticIpName_):
+    release_static_ip_resp = ''
+    try:
+        release_static_ip_resp = lsclient.release_static_ip(
+            staticIpName = vStaticIpName_ 
+        )
+    except Exception as ex:
+        print('Call to release_static_ip failed with exception as below:') 
+        print(ex)
+    
+    #debugLog (release_static_ip_resp)
+ 
+    if release_static_ip_resp != '':
+        if (str(release_static_ip_resp['ResponseMetadata']['HTTPStatusCode']) == '200' and
+            str(release_static_ip_resp['operations'][0]['status']) == 'Succeeded'):
+            debugLog ( 'StaticIp is released: ' + release_static_ip_resp['operations'][0]['resourceName'] )
+            
+def main():
+    debugLog ('\n*****Static IP before relocation:****')
+    getStaticIp(vStaticIpName)
+    debugLog ('')
+    releaseStaticIp(vStaticIpName)
+    allocateStaticIp(vStaticIpName)
+    attachStaticIp(vStaticIpName, vInstanceName)
+    debugLog ('\n*****Static IP after relocation:****')
+    getStaticIp(vStaticIpName)
+    
+if __name__ == "__main__":
+    main();
+    
+        
+''' aws cli commands:
+aws lightsail allocate-static-ip --static-ip-name StaticIp-Oregon-New
+aws lightsail detach-static-ip --static-ip-name StaticIp-Oregon-2
+aws lightsail get-static-ips
+aws lightsail get-instances
+aws lightsail get-instance --instance-name Ubuntu-1GB-Oregon-1
+aws lightsail attach-static-ip --static-ip-name StaticIp-Oregon-New --instance-name Ubuntu-1GB-Oregon-1
+aws lightsail get-static-ips
+aws lightsail get-static-ip --static-ip-name StaticIp-Oregon-New
+aws lightsail release-static-ip --static-ip-name StaticIp-Oregon-2
+aws lightsail get-static-ips
+'''
