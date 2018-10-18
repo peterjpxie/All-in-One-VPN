@@ -1,0 +1,73 @@
+{
+	'IsTruncated': False,
+	'MaxItems': '100',
+	'ResponseMetadata': {
+		'RequestId': 'd1790ec9-d2b7-11e8-854c-9f9066d83f94',
+		'HTTPHeaders': {
+			'content-type': 'text/xml',
+			'x-amzn-requestid': 'd1790ec9-d2b7-11e8-854c-9f9066d83f94',
+			'date': 'Thu,
+			18Oct201809: 25: 56GMT',
+			'content-length': '1680'
+		},
+		'HTTPStatusCode': 200,
+		'RetryAttempts': 0
+	},
+	'ResourceRecordSets': [{
+		'TTL': 300,
+		'ResourceRecords': [{
+			'Value': 'ns-579.awsdns-08.net.'
+		},
+		{
+			'Value': 'ns-2028.awsdns-61.co.uk.'
+		},
+		{
+			'Value': 'ns-1040.awsdns-02.org.'
+		},
+		{
+			'Value': 'ns-454.awsdns-56.com.'
+		}],
+		'Name': 'petersvpn.com.',
+		'Type': 'NS'
+	},
+	{
+		'TTL': 900,
+		'ResourceRecords': [{
+			'Value': 'ns-579.awsdns-08.net.awsdns-hostmaster.amazon.com.17200900120960086400'
+		}],
+		'Name': 'petersvpn.com.',
+		'Type': 'SOA'
+	},
+	{
+		'TTL': 300,
+		'ResourceRecords': [{
+			'Value': '35.197.180.127'
+		}],
+		'Name': 'au.petersvpn.com.',
+		'Type': 'A'
+	},
+	{
+		'TTL': 300,
+		'ResourceRecords': [{
+			'Value': '35.197.180.127'
+		}],
+		'Name': 'g.petersvpn.com.',
+		'Type': 'A'
+	},
+	{
+		'TTL': 300,
+		'ResourceRecords': [{
+			'Value': '34.218.37.101'
+		}],
+		'Name': 'usw.petersvpn.com.',
+		'Type': 'A'
+	},
+	{
+		'TTL': 300,
+		'ResourceRecords': [{
+			'Value': '35.197.180.127'
+		}],
+		'Name': 'www3.petersvpn.com.',
+		'Type': 'A'
+	}]
+}

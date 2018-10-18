@@ -1,11 +1,12 @@
 '''
-Change Static IP for Lightsail VPS automatically
+Change Static IP for Lightsail VPS automatically and update respective DNS settings
 '''
 # Indent: 4 spaces (Enable tab for 4 spaces in Notepad++ in settings/Preferenes/Languages )
 
 import boto3
 import json
 from datetime import datetime, time, date
+from time import sleep
 
 # Parameters
 DEBUG_OPTION=1
@@ -49,6 +50,8 @@ def getStaticIp(vStaticIpName_):
             debugLog ( 'staticIp name: ' + static_ip_response['staticIp']['name'] )
             debugLog ( 'staticIp ipAddress: ' + static_ip_response['staticIp']['ipAddress'] )
             debugLog ( 'Attached to: ' + static_ip_response['staticIp']['attachedTo'] ) 
+            return static_ip_response['staticIp']['ipAddress'] 
+    
 
 def getStaticIps():            
     static_ips_response = lsclient.get_static_ips()
@@ -112,9 +115,8 @@ def releaseStaticIp( vStaticIpName_):
             str(release_static_ip_resp['operations'][0]['status']) == 'Succeeded'):
             debugLog ( 'StaticIp is released: ' + release_static_ip_resp['operations'][0]['resourceName'] )
 
-# Release the old static IP
-def changeDNS( vHostedZoneId_, vDNS_name_, vIpAddress_):
-    
+# Change DNS A record
+def changeDNS( vHostedZoneId_, vDNS_name_, vIpAddress_):    
     change_resource_record_sets_resp = ''
     try:
         change_resource_record_sets_resp = rtclient.change_resource_record_sets(
@@ -143,70 +145,51 @@ def changeDNS( vHostedZoneId_, vDNS_name_, vIpAddress_):
         print('Call to change_resource_record_sets failed with exception as below:') 
         print(ex)
     
-    debugLog (change_resource_record_sets_resp)
- 
-'''
-    if release_static_ip_resp != '':
-        if (str(release_static_ip_resp['ResponseMetadata']['HTTPStatusCode']) == '200' and
-            str(release_static_ip_resp['operations'][0]['status']) == 'Succeeded'):
-            debugLog ( 'StaticIp is released: ' + release_static_ip_resp['operations'][0]['resourceName'] )
- 
-'''
+    # debugLog (change_resource_record_sets_resp)
+    if change_resource_record_sets_resp != '':
+        if (str(change_resource_record_sets_resp['ResponseMetadata']['HTTPStatusCode']) == '200' and
+            str(change_resource_record_sets_resp['ChangeInfo']['Status']) == 'PENDING'):
+            debugLog ( '\nDNS is being updated: ' + vDNS_name_ + ' - ' + vIpAddress_ )
 
-''' 
-    response = client.change_resource_record_sets(
-        HostedZoneId='string',
-        ChangeBatch={
-            'Comment': 'string',
-            'Changes': [
-                {
-                    'Action': 'CREATE'|'DELETE'|'UPSERT',
-                    'ResourceRecordSet': {
-                        'Name': 'string',
-                        'Type': 'SOA'|'A'|'TXT'|'NS'|'CNAME'|'MX'|'NAPTR'|'PTR'|'SRV'|'SPF'|'AAAA'|'CAA',
-                        'SetIdentifier': 'string',
-                        'Weight': 123,
-                        'Region': 'us-east-1'|'us-east-2'|'us-west-1'|'us-west-2'|'ca-central-1'|'eu-west-1'|'eu-west-2'|'eu-west-3'|'eu-central-1'|'ap-southeast-1'|'ap-southeast-2'|'ap-northeast-1'|'ap-northeast-2'|'ap-northeast-3'|'sa-east-1'|'cn-north-1'|'cn-northwest-1'|'ap-south-1',
-                        'GeoLocation': {
-                            'ContinentCode': 'string',
-                            'CountryCode': 'string',
-                            'SubdivisionCode': 'string'
-                        },
-                        'Failover': 'PRIMARY'|'SECONDARY',
-                        'MultiValueAnswer': True|False,
-                        'TTL': 123,
-                        'ResourceRecords': [
-                            {
-                                'Value': 'string'
-                            },
-                        ],
-                        'AliasTarget': {
-                            'HostedZoneId': 'string',
-                            'DNSName': 'string',
-                            'EvaluateTargetHealth': True|False
-                        },
-                        'HealthCheckId': 'string',
-                        'TrafficPolicyInstanceId': 'string'
-                    }
-                },
-            ]
-        }
-    )            
-'''
-            
+# List DNS A record
+def listDNS_A_record( vHostedZoneId_, vSubDomainName_):  
+    vDomainName = vSubDomainName_ + '.'
+    list_resource_record_sets_resp = ''
+    try:
+        list_resource_record_sets_resp = rtclient.list_resource_record_sets(
+            HostedZoneId = vHostedZoneId_        
+        ) 
+    except Exception as ex:
+        print('Call to list_resource_record_sets failed with exception as below:') 
+        print(ex)
+    
+    # debugLog (list_resource_record_sets_resp)
+    
+    if list_resource_record_sets_resp != '':
+        if str(list_resource_record_sets_resp['ResponseMetadata']['HTTPStatusCode']) == '200':
+            for record in list_resource_record_sets_resp['ResourceRecordSets']:
+                if record['Type'] == 'A' and record['Name'] == vDomainName:
+                    debugLog('Checking DNS setting:')
+                    debugLog(record['Name']+': '+ record['ResourceRecords'][0]['Value'])
+                    return record['ResourceRecords'][0]['Value']
+                    
+                   
 def main():
-    '''
-    debugLog ('\n*****Static IP before relocation:****')
+    debugLog ('\n*****Static IP before relocation:*****')
     getStaticIp(vStaticIpName)
     debugLog ('')
     releaseStaticIp(vStaticIpName)
     allocateStaticIp(vStaticIpName)
     attachStaticIp(vStaticIpName, vInstanceName)
-    debugLog ('\n*****Static IP after relocation:****')
-    getStaticIp(vStaticIpName)
-    '''
+    debugLog ('\n****Static IP after relocation:*****')
+    vStaticIP = getStaticIp(vStaticIpName)  
+    if vStaticIP != None:
+        changeDNS( vHostedZoneId, vDNS_name, vStaticIP)
+    else:
+        debugLog('Failed to get new static IP.')
+    sleep(5)
+    listDNS_A_record( vHostedZoneId, vDNS_name)
     
-    changeDNS( vHostedZoneId, vDNS_name, '52.40.255.188')
     
 if __name__ == '__main__':
     main();
