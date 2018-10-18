@@ -175,7 +175,9 @@ def listDNS_A_record( vHostedZoneId_, vSubDomainName_):
                     
                    
 def main():
-    debugLog ('\n*****Static IP before relocation:*****')
+    debugLog ('Time: ' + cur_dt)
+    debugLog ('*****Static IP before relocation:*****')
+    '''
     getStaticIp(vStaticIpName)
     debugLog ('')
     releaseStaticIp(vStaticIpName)
@@ -188,6 +190,7 @@ def main():
     else:
         debugLog('Failed to get new static IP.')
     sleep(5)
+    '''
     listDNS_A_record( vHostedZoneId, vDNS_name)
     
     
