@@ -49,7 +49,7 @@ done
 
 if [ "$option" = "" ]; then
 echo "What do you want to do?"
-echo "   1) Install all VPN services: PPTP, IPSec, L2TP, OpenVPN, Tinyproxy"
+echo "   1) Install all VPN services: PPTP, IPSec, L2TP, OpenVPN"
 echo "   2) Install all VPN services except OpenVPN"
 echo "   3) Exit"
 read -p "Select an option [1-3]: " option
@@ -69,7 +69,7 @@ path_of_mainScript=`dirname $0`
 # Install VPNs
 sh ${path_of_mainScript}/l2tp/vpnsetup.sh
 sh ${path_of_mainScript}/pptp/setup.sh
-sh ${path_of_mainScript}/tinyproxy/setup_tinyproxy.sh
+# sh ${path_of_mainScript}/tinyproxy/setup_tinyproxy.sh
 
 if [ "$option" != "2" ] ; then
 bash ${path_of_mainScript}/openvpn/openvpn-install.sh
@@ -102,5 +102,4 @@ Congrats! VPN servers are ready.
 PSK (IPSec / L2TP): petersvpn
 To create VPN users for PPTP, IPSec, L2TP, run ./manageuser.sh.
 To create VPN client profiles for OpenVPN, run ./openvpn/openvpn-install.sh.
-Web proxy port: $tinyproxy_port 
 ==============================================================================="
