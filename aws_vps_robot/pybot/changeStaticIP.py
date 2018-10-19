@@ -15,7 +15,7 @@ DEBUG_OPTION=1
 vInstanceName = 'Ubuntu-1GB-Oregon-1'
 vStaticIpName = 'StaticIp-Oregon-Auto'
 vHostedZoneId = '/hostedzone/Z2ZVCN3CYRFI7N'
-vDNS_name = 'usw.petersvpn.com'
+vDNS_name = 'us.petersvpn.com'
 
 
 # boto3.setup_default_session(region_name='us-west-2')
