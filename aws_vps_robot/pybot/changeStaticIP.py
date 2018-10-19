@@ -188,7 +188,7 @@ def main():
         changeDNS( vHostedZoneId, vDNS_name, vStaticIP)
     else:
         debugLog('Failed to get new static IP.')
-    sleep(5)   
+    sleep(2)   
     listDNS_A_record( vHostedZoneId, vDNS_name)
     
     
