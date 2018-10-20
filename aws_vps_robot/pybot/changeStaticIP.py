@@ -16,6 +16,7 @@ vInstanceName = 'Ubuntu-1GB-Oregon-1'
 vStaticIpName = 'StaticIp-Oregon-Auto'
 vHostedZoneId = '/hostedzone/Z2ZVCN3CYRFI7N'
 vDNS_name = 'us.petersvpn.com'
+vIpHistoryFilename = 'static_ip_history.csv'
 
 
 # boto3.setup_default_session(region_name='us-west-2')
@@ -172,9 +173,22 @@ def listDNS_A_record( vHostedZoneId_, vSubDomainName_):
                     debugLog('Checking DNS setting:')
                     debugLog(record['Name']+': '+ record['ResourceRecords'][0]['Value'])
                     return record['ResourceRecords'][0]['Value']
-                    
+
+def isIpAddressExit(vFilename_,vTargetIp_) 
+    # File content format
+    # 10.1.1.1,2018-10-01_05-00-00
+    ip_loadtxt = np.loadtxt(vFilename_,dtype=str, delimiter=',')
+    for i in ip_loadtxt[:,0]:
+        # print(i)
+        if i == vTargetIp_:
+            debugLog ('Found target ip:', i)
+            return True
+    else:
+        debugLog('Don\'t find target ip.')
+        return False
                    
 def main():
+    
     debugLog ('\nTime: ' + datetime.now().strftime('%Y-%m-%d %H:%M:%S'))
     debugLog ('*****Static IP before relocation:*****')
     getStaticIp(vStaticIpName)
@@ -185,13 +199,13 @@ def main():
     debugLog ('\n****Static IP after relocation:*****')
     vStaticIP = getStaticIp(vStaticIpName)  
     if vStaticIP != None:
+        isIpAddressExit()
         changeDNS( vHostedZoneId, vDNS_name, vStaticIP)
     else:
         debugLog('Failed to get new static IP.')
     sleep(2)   
     listDNS_A_record( vHostedZoneId, vDNS_name)
-    
-    
+        
 if __name__ == '__main__':
     main();
     
