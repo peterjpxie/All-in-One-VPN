@@ -7,6 +7,7 @@ import boto3
 import json
 from datetime import datetime, time, date
 from time import sleep
+import numpy as np
 
 # Parameters
 DEBUG_OPTION=1
@@ -20,7 +21,6 @@ vIpHistoryFilename = 'static_ip_history.csv'
 
 
 # boto3.setup_default_session(region_name='us-west-2')
-cur_dt = datetime.now().strftime('%Y-%m-%d_%H-%M-%S')
 # lsclient = boto3.client('lightsail')
 lsclient = boto3.client('lightsail', region_name='us-west-2')
 rtclient = boto3.client('route53')
@@ -43,7 +43,7 @@ def getStaticIp(vStaticIpName_):
         )
     except Exception as ex:
         print('Call to get_static_ip failed with exception as below:') 
-        print(ex)
+        print(str(ex))
     
     #debugLog (static_ip_response)
     if static_ip_response != '':
@@ -67,7 +67,7 @@ def allocateStaticIp( vStaticIpName_ ):
         )
     except Exception as ex:
         print('Call to allocate_static_ip failed with exception as below:') 
-        print(ex)
+        print(str(ex))
     
     # debugLog (allocate_static_ip_resp)
     
@@ -87,7 +87,7 @@ def attachStaticIp( vStaticIpName_, vInstanceName_):
         )
     except Exception as ex:
         print('Call to attach_static_ip failed with exception as below:') 
-        print(ex)
+        print(str(ex))
     
     # debugLog (attach_static_ip_resp)
 
@@ -107,7 +107,7 @@ def releaseStaticIp( vStaticIpName_):
         )
     except Exception as ex:
         print('Call to release_static_ip failed with exception as below:') 
-        print(ex)
+        print(str(ex))
     
     #debugLog (release_static_ip_resp)
  
@@ -144,7 +144,7 @@ def changeDNS( vHostedZoneId_, vDNS_name_, vIpAddress_):
         
     except Exception as ex:
         print('Call to change_resource_record_sets failed with exception as below:') 
-        print(ex)
+        print(str(ex))
     
     # debugLog (change_resource_record_sets_resp)
     if change_resource_record_sets_resp != '':
@@ -162,7 +162,7 @@ def listDNS_A_record( vHostedZoneId_, vSubDomainName_):
         ) 
     except Exception as ex:
         print('Call to list_resource_record_sets failed with exception as below:') 
-        print(ex)
+        print(str(ex))
     
     # debugLog (list_resource_record_sets_resp)
     
@@ -174,37 +174,57 @@ def listDNS_A_record( vHostedZoneId_, vSubDomainName_):
                     debugLog(record['Name']+': '+ record['ResourceRecords'][0]['Value'])
                     return record['ResourceRecords'][0]['Value']
 
-def isIpAddressExit(vFilename_,vTargetIp_) 
+def isIpAddressExit(vFilename_,vTargetIp_): 
     # File content format
     # 10.1.1.1,2018-10-01_05-00-00
-    ip_loadtxt = np.loadtxt(vFilename_,dtype=str, delimiter=',')
-    for i in ip_loadtxt[:,0]:
-        # print(i)
-        if i == vTargetIp_:
-            debugLog ('Found target ip:', i)
-            return True
-    else:
-        debugLog('Don\'t find target ip.')
+    try:
+        ip_loadtxt = np.loadtxt(vFilename_,dtype=str, delimiter=',')
+    #except OSError as ex:
+    #    print('Error loading file with error:\n' + str(ex))
+    except Exception as ex:
+        print(str(ex)) 
         return False
-                   
+    else:       
+        #debugLog(ip_loadtxt.reshape(-1,2))
+        for i in ip_loadtxt.reshape(-1,2)[:,0]:
+            #debugLog(i)
+            if i == vTargetIp_:
+                debugLog ('Found matched ip:' + i)
+                return True
+        else: # Empty file will also fall into here.
+            # debugLog('Don\'t find matched ip.')
+            return False
+
+def writeIpHistoryFile(vFilename_,vIpAddress_): 
+    cur_dt = datetime.now().strftime('%Y-%m-%d_%H-%M-%S')
+    f = open(vFilename_,"a") 
+    f.write(vIpAddress_ + ',' + cur_dt + '\n')
+    f.close()    
+                
 def main():
-    
-    debugLog ('\nTime: ' + datetime.now().strftime('%Y-%m-%d %H:%M:%S'))
-    debugLog ('*****Static IP before relocation:*****')
-    getStaticIp(vStaticIpName)
-    debugLog ('')
-    releaseStaticIp(vStaticIpName)
-    allocateStaticIp(vStaticIpName)
-    attachStaticIp(vStaticIpName, vInstanceName)
-    debugLog ('\n****Static IP after relocation:*****')
-    vStaticIP = getStaticIp(vStaticIpName)  
-    if vStaticIP != None:
-        isIpAddressExit()
-        changeDNS( vHostedZoneId, vDNS_name, vStaticIP)
+    # cur_dt = datetime.now().strftime('%Y-%m-%d_%H-%M-%S')
+    max_retry=2
+    for i in range(max_retry):
+        debugLog ('\nTime: ' + datetime.now().strftime('%Y-%m-%d %H:%M:%S'))
+        debugLog ('*****Static IP before relocation:*****')
+        getStaticIp(vStaticIpName)
+        debugLog ('')
+        releaseStaticIp(vStaticIpName)
+        allocateStaticIp(vStaticIpName)
+        attachStaticIp(vStaticIpName, vInstanceName)
+        debugLog ('\n****Static IP after relocation:*****')
+        vStaticIP = getStaticIp(vStaticIpName) 
+        if (vStaticIP != None and isIpAddressExit(vIpHistoryFilename,vStaticIP) == False):
+            debugLog('Static IP is re-allocated successfully.')
+            writeIpHistoryFile(vIpHistoryFilename,vStaticIP)
+            changeDNS( vHostedZoneId, vDNS_name, vStaticIP)
+            sleep(2)   
+            listDNS_A_record( vHostedZoneId, vDNS_name)
+            break
+        # wait for some time for next loop
+        sleep(1)
     else:
-        debugLog('Failed to get new static IP.')
-    sleep(2)   
-    listDNS_A_record( vHostedZoneId, vDNS_name)
+        debugLog('Failed to get a new static IP in ' + str(max_retry) + ' attempts.' )
         
 if __name__ == '__main__':
     main();
