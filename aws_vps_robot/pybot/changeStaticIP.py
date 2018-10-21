@@ -8,6 +8,7 @@ import json
 from datetime import datetime, time, date
 from time import sleep
 import numpy as np
+import os
 
 # Parameters
 DEBUG_OPTION=1
@@ -19,6 +20,7 @@ vHostedZoneId = '/hostedzone/Z2ZVCN3CYRFI7N'
 vDNS_name = 'us.petersvpn.com'
 vIpHistoryFilename = 'static_ip_history.csv'
 
+root_path=os.path.dirname(os.path.realpath(__file__))
 
 # boto3.setup_default_session(region_name='us-west-2')
 # lsclient = boto3.client('lightsail')
@@ -203,7 +205,8 @@ def writeIpHistoryFile(vFilename_,vIpAddress_):
                 
 def main():
     # cur_dt = datetime.now().strftime('%Y-%m-%d_%H-%M-%S')
-    max_retry=2
+    max_retry=3
+    vFull_IpHistoryFilename = str(root_path) + '/' + vIpHistoryFilename
     for i in range(max_retry):
         debugLog ('\nTime: ' + datetime.now().strftime('%Y-%m-%d %H:%M:%S'))
         debugLog ('*****Static IP before relocation:*****')
@@ -214,9 +217,9 @@ def main():
         attachStaticIp(vStaticIpName, vInstanceName)
         debugLog ('\n****Static IP after relocation:*****')
         vStaticIP = getStaticIp(vStaticIpName) 
-        if (vStaticIP != None and isIpAddressExit(vIpHistoryFilename,vStaticIP) == False):
+        if (vStaticIP != None and isIpAddressExit(vFull_IpHistoryFilename,vStaticIP) == False):
             debugLog('Static IP is re-allocated successfully.')
-            writeIpHistoryFile(vIpHistoryFilename,vStaticIP)
+            writeIpHistoryFile(vFull_IpHistoryFilename,vStaticIP)
             changeDNS( vHostedZoneId, vDNS_name, vStaticIP)
             sleep(2)   
             listDNS_A_record( vHostedZoneId, vDNS_name)
