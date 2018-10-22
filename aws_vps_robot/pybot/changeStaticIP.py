@@ -179,12 +179,15 @@ def listDNS_A_record( vHostedZoneId_, vSubDomainName_):
 def isIpAddressExit(vFilename_,vTargetIp_): 
     # File content format
     # 10.1.1.1,2018-10-01_05-00-00
+    if not os.path.exists(vFilename_):
+        debugLog(vFilename_ + ' does not exits.')
+        return False
     try:
         ip_loadtxt = np.loadtxt(vFilename_,dtype=str, delimiter=',')
     #except OSError as ex:
     #    print('Error loading file with error:\n' + str(ex))
     except Exception as ex:
-        print(str(ex)) 
+        debugLog(str(ex)) 
         return False
     else:       
         #debugLog(ip_loadtxt.reshape(-1,2))
@@ -206,9 +209,10 @@ def writeIpHistoryFile(vFilename_,vIpAddress_):
 def main():
     # cur_dt = datetime.now().strftime('%Y-%m-%d_%H-%M-%S')
     max_retry=3
-    vFull_IpHistoryFilename = str(root_path) + '/' + vIpHistoryFilename
+    vFull_IpHistoryFilename = str(root_path) + os.sep + vIpHistoryFilename
     for i in range(max_retry):
         debugLog ('\nTime: ' + datetime.now().strftime('%Y-%m-%d %H:%M:%S'))
+        debugLog ('======================================')
         debugLog ('*****Static IP before relocation:*****')
         getStaticIp(vStaticIpName)
         debugLog ('')
