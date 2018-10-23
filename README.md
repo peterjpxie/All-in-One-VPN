@@ -1,5 +1,6 @@
 # All-in-One-VPN
-One script to install all VPN applications: PPTP, IPSec, L2TP, OpenVPN, Tinyproxy.
+One script to install all VPN applications: PPTP, IPSec, L2TP, OpenVPN.
+And re-allocate server IP and change DNS mapping automatically by AWS python API.
 
 Check [wiki](https://github.com/peterjpxie/All-in-One-VPN/wiki) for details.
 
