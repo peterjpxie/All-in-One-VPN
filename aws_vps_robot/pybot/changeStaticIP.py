@@ -217,10 +217,10 @@ def main():
         getStaticIp(vStaticIpName)
         debugLog ('')
         releaseStaticIp(vStaticIpName)
-	sleep(1)
+        sleep(1)
         allocateStaticIp(vStaticIpName)
         attachStaticIp(vStaticIpName, vInstanceName)
-	sleep(1)
+        sleep(1)
         debugLog ('\n****Static IP after relocation:*****')
         vStaticIP = getStaticIp(vStaticIpName) 
         if (vStaticIP != None and isIpAddressExit(vFull_IpHistoryFilename,vStaticIP) == False):
