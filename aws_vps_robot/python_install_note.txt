@@ -1,3 +1,16 @@
 apt-get install python3-pip
 easy_install -U pip
 
+pip3 install virtualenv 
+pip3 install awscli --upgrade --user
+echo "export PATH=~/.local/bin:\$PATH" >> ~/.bashrc
+. ~/.bashrc
+aws configure
+
+# Note: Don't install boto3 by 'pip install boto3', which does not service lightsail service.
+git clone https://github.com/boto/boto3.git
+cd boto3
+virtualenv venv
+. venv/bin/activate
+pip3 install -r requirements.txt
+pip3 install -e .
