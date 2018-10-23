@@ -1,3 +1,7 @@
+######################
+Install python3, virtualenv, aws cli, boto3, numpy as below on Ubuntu.
+######################
+
 apt-get install python3-pip
 easy_install -U pip
 
@@ -8,9 +12,18 @@ echo "export PATH=~/.local/bin:\$PATH" >> ~/.bashrc
 aws configure
 
 # Note: Don't install boto3 by 'pip install boto3', which does not service lightsail service.
+
+# Install with virtualenv
 git clone https://github.com/boto/boto3.git
 cd boto3
 virtualenv venv
 . venv/bin/activate
 pip3 install -r requirements.txt
 pip3 install -e .
+
+# install without virtualenv
+cd boto3
+pip3 install -r requirements.txt
+pip3 install -e .
+
+python -m pip install --user numpy
