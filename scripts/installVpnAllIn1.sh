@@ -96,7 +96,7 @@ esac
 fi
 
 # User management
-tinyproxy_port=$(egrep "^Port " /etc/tinyproxy.conf |awk '{print $2}')
+#tinyproxy_port=$(egrep "^Port " /etc/tinyproxy.conf |awk '{print $2}')
 echo "===============================================================================
 Congrats! VPN servers are ready.
 PSK (IPSec / L2TP): petersvpn
