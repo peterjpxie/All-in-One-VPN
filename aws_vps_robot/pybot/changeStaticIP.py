@@ -17,8 +17,10 @@ DEBUG_OPTION=1
 vInstanceName = 'Ubuntu-1GB-Oregon-1'
 vStaticIpName = 'StaticIp-Oregon-Auto'
 vHostedZoneId = '/hostedzone/Z2ZVCN3CYRFI7N'
-vDNS_name = 'us.petersvpn.com'
+vDNS_name_us = 'us.petersvpn.com'
+vDNS_name_main = 'petersvpn.com'
 vIpHistoryFilename = 'static_ip_history.csv'
+vIpHistoryFileColumn = 3
 
 root_path=os.path.dirname(os.path.realpath(__file__))
 
@@ -172,8 +174,7 @@ def listDNS_A_record( vHostedZoneId_, vSubDomainName_):
         if str(list_resource_record_sets_resp['ResponseMetadata']['HTTPStatusCode']) == '200':
             for record in list_resource_record_sets_resp['ResourceRecordSets']:
                 if record['Type'] == 'A' and record['Name'] == vDomainName:
-                    debugLog('Checking DNS setting:')
-                    debugLog(record['Name']+': '+ record['ResourceRecords'][0]['Value'])
+                    debugLog('Checking DNS setting: ' + record['Name']+' - '+ record['ResourceRecords'][0]['Value'])
                     return record['ResourceRecords'][0]['Value']
 
 def isIpAddressExit(vFilename_,vTargetIp_): 
@@ -191,7 +192,7 @@ def isIpAddressExit(vFilename_,vTargetIp_):
         return False
     else:       
         #debugLog(ip_loadtxt.reshape(-1,2))
-        for i in ip_loadtxt.reshape(-1,2)[:,0]:
+        for i in ip_loadtxt.reshape(-1,vIpHistoryFileColumn)[:,0]:
             #debugLog(i)
             if i == vTargetIp_:
                 debugLog ('Found matched ip:' + i)
@@ -200,10 +201,10 @@ def isIpAddressExit(vFilename_,vTargetIp_):
             # debugLog('Don\'t find matched ip.')
             return False
 
-def writeIpHistoryFile(vFilename_,vIpAddress_): 
+def writeIpHistoryFile(vFilename_,vIpAddress_,vTries_): 
     cur_dt = datetime.now().strftime('%Y-%m-%d_%H-%M-%S')
     f = open(vFilename_,"a") 
-    f.write(vIpAddress_ + ',' + cur_dt + '\n')
+    f.write(vIpAddress_ + ',' + cur_dt + ',' + vTries_ + '\n')
     f.close()    
                 
 def main():
@@ -223,12 +224,15 @@ def main():
         sleep(1)
         debugLog ('\n****Static IP after relocation:*****')
         vStaticIP = getStaticIp(vStaticIpName) 
+        # Update respective DNS mapping
         if (vStaticIP != None and isIpAddressExit(vFull_IpHistoryFilename,vStaticIP) == False):
             debugLog('Static IP is re-allocated successfully.')
-            writeIpHistoryFile(vFull_IpHistoryFilename,vStaticIP)
-            changeDNS( vHostedZoneId, vDNS_name, vStaticIP)
+            writeIpHistoryFile(vFull_IpHistoryFilename,vStaticIP,str(i+1))
+            changeDNS( vHostedZoneId, vDNS_name_us, vStaticIP)
+            changeDNS( vHostedZoneId, vDNS_name_main, vStaticIP)
             sleep(2)   
-            listDNS_A_record( vHostedZoneId, vDNS_name)
+            listDNS_A_record( vHostedZoneId, vDNS_name_us)
+            listDNS_A_record( vHostedZoneId, vDNS_name_main)
             break
         # wait for some time for next loop
         sleep(1)
@@ -237,7 +241,6 @@ def main():
         
 if __name__ == '__main__':
     main();
-    
         
 ''' aws cli commands:
 aws lightsail allocate-static-ip --static-ip-name StaticIp-Oregon-New
