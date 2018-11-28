@@ -11,7 +11,7 @@ echo "export PATH=~/.local/bin:\$PATH" >> ~/.bashrc
 . ~/.bashrc
 aws configure
 
-# Note: Don't install boto3 by 'pip install boto3', which does not service lightsail service.
+# Note: Don't install boto3 by 'pip install boto3', which does not support lightsail service.
 
 # Install with virtualenv
 git clone https://github.com/boto/boto3.git
