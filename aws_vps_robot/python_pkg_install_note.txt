@@ -1,7 +1,7 @@
 #######################
 Install python3, virtualenv, aws cli, boto3, numpy as below on Ubuntu.
 #######################
-
+apt-get install python3
 apt-get install python3-pip
 easy_install -U pip
 
