@@ -19,6 +19,7 @@ vStaticIpName = 'StaticIp-Oregon-Auto'
 vHostedZoneId = '/hostedzone/Z2ZVCN3CYRFI7N'
 vDNS_name_us = 'us.petersvpn.com'
 vDNS_name_main = 'petersvpn.com'
+vDNS_name_web = 'www.petersvpn.com'
 vIpHistoryFilename = 'static_ip_history.csv'
 vIpHistoryFileColumn = 3
 
@@ -230,9 +231,11 @@ def main():
             writeIpHistoryFile(vFull_IpHistoryFilename,vStaticIP,str(i+1))
             changeDNS( vHostedZoneId, vDNS_name_us, vStaticIP)
             changeDNS( vHostedZoneId, vDNS_name_main, vStaticIP)
+            changeDNS( vHostedZoneId, vDNS_name_web, vStaticIP)
             sleep(2)   
             listDNS_A_record( vHostedZoneId, vDNS_name_us)
             listDNS_A_record( vHostedZoneId, vDNS_name_main)
+            listDNS_A_record( vHostedZoneId, vDNS_name_web)
             break
         # wait for some time for next loop
         sleep(1)
