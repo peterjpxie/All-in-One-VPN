@@ -178,7 +178,7 @@ def listDNS_A_record( vHostedZoneId_, vSubDomainName_):
                     debugLog('Checking DNS setting: ' + record['Name']+' - '+ record['ResourceRecords'][0]['Value'])
                     return record['ResourceRecords'][0]['Value']
 
-def isIpAddressExit(vFilename_,vTargetIp_): 
+def isIpAddressExist(vFilename_,vTargetIp_): 
     # File content format
     # 10.1.1.1,2018-10-01_05-00-00
     if not os.path.exists(vFilename_):
@@ -226,7 +226,7 @@ def main():
         debugLog ('\n****Static IP after relocation:*****')
         vStaticIP = getStaticIp(vStaticIpName) 
         # Update respective DNS mapping
-        if (vStaticIP != None and isIpAddressExit(vFull_IpHistoryFilename,vStaticIP) == False):
+        if (vStaticIP != None and isIpAddressExist(vFull_IpHistoryFilename,vStaticIP) == False):
             debugLog('Static IP is re-allocated successfully.')
             writeIpHistoryFile(vFull_IpHistoryFilename,vStaticIP,str(i+1))
             changeDNS( vHostedZoneId, vDNS_name_us, vStaticIP)
