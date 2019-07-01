@@ -39,11 +39,12 @@ mv $1 ${1}.prev
 fi
 }
 
-cp_existing_file()  { 
-if [ -f $1 ]; then 
-cp $1 ${1}.prev
-fi
-}
+# Obsolete function. Use cp --backup directly.
+# cp_existing_file()  { 
+# if [ -f $1 ]; then 
+# cp $1 ${1}.prev
+# fi
+# }
 
 # Backup filenames
 # chap-secrets
@@ -58,6 +59,8 @@ crontab_bk_fullname="$backup_path/crontab_root.txt"
 bash_aliases_bk_fullname="$backup_path/bash_aliases"
 # ssh authorized_keys
 authorized_keys_bk_fullname="$backup_path/authorized_keys"
+# /etc/rc.local
+rc_local_bk_fullname="$backup_path/rc_local"
 
 backup() {
 # chap-secrets
@@ -82,13 +85,17 @@ cp --backup ~/.bash_aliases $bash_aliases_bk_fullname
 # ssh authorized_keys
 cp --backup ~/.ssh/authorized_keys $authorized_keys_bk_fullname 
 
-echo "Backup successfully for the following:
+# /etc/rc.local
+cp --backup /etc/rc.local $rc_local_bk_fullname 
+
+echo "Backup successfully at $backup_path for the following:
 /etc/ppp/chap-secrets
 /etc/ipsec.d/passwd
 /etc/openvpn - may be skipped
 /var/spool/cron/crontabs/root
 ~/.bash_aliases 
 ~/.ssh/authorized_keys
+/etc/rc.local
 "
 #echo "Backup is done."
 }
@@ -111,8 +118,7 @@ if [ $skip_openvpn -ne 1 ]; then
 	service openvpn restart
 fi
 
-# backup crontab 
-# cp_existing_file /var/spool/cron/crontabs/root 
+# crontab 
 cp --backup $crontab_bk_fullname /var/spool/cron/crontabs/root 
 
 # .bash_aliases
@@ -122,14 +128,20 @@ cp --backup  $bash_aliases_bk_fullname ~/.bash_aliases
 # ssh authorized_keys
 cp --backup $authorized_keys_bk_fullname ~/.ssh/authorized_keys 
 
+# /etc/rc.local
+# Note: don't overwrite this file. Review and modify manually with caution.
+# cp --backup $rc_local_bk_fullname /etc/rc.local
+
 echo "
-Restore successfully for the following:
+Restore successfully from $backup_path for the following:
 /etc/ppp/chap-secrets
 /etc/ipsec.d/passwd
 /etc/openvpn - may be skipped
 /var/spool/cron/crontabs/root
 ~/.bash_aliases 
 ~/.ssh/authorized_keys
+
+Note: /etc/rc.local is not touched. Please review and revise manually. 
 "
 
 }
@@ -141,6 +153,7 @@ fileList="/etc/ppp/chap-secrets
 	/var/spool/cron/crontabs/root
 	/root/.bash_aliases
 	/root/.ssh/authorized_keys
+    /etc/rc.local
 "
 for i in $fileList
 do
