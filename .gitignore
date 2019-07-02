@@ -1,7 +1,7 @@
 # Application specific files
 static_ip_history.csv
 update_guest_pwd.ini
-changeStaticIP.log
+changeStaticIP.log*
 
 # Byte-compiled / optimized / DLL files
 __pycache__/

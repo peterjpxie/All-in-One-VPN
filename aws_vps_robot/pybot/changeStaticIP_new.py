@@ -10,6 +10,7 @@ from time import sleep
 import numpy as np
 import os
 import logging
+import ipdb
 
 # Parameters
 # DEBUG_OPTION=1
@@ -32,9 +33,8 @@ vpn_servers = [
     {
         'instance_name': 'Ubuntu-1GB-Oregon-1',
         'static_ip_name': 'StaticIp-Oregon-Auto',
-        'DNS_name': 'us.petersvpn.com'
-    },
-    {
+        'DNS_names': ['us.petersvpn.com','petersvpn.com','www.petersvpn.com'],
+        'region_name': 'us-west-2'
     }
     ] 
 
@@ -57,17 +57,13 @@ root_path=os.path.dirname(os.path.realpath(__file__))
 lsclient = boto3.client('lightsail', region_name='us-west-2')
 rtclient = boto3.client('route53')
 
-# Obsolete. Use standard logging.
-# def debugLog(logString):
-#     if DEBUG_OPTION:
-#         print (logString)
 
 def writeFile(filename, strText):
     f = open(filename,'w') # nuke or create the file !
     f.write(strText)
     f.close()
 
-def getStaticIp(vStaticIpName_):
+def getStaticIp(vStaticIpName_,lsclient):
     static_ip_response = ''
     try: 
         static_ip_response = lsclient.get_static_ip( 
@@ -87,12 +83,12 @@ def getStaticIp(vStaticIpName_):
             return static_ip_response['staticIp']['ipAddress'] 
     
 
-def getStaticIps():            
+def getStaticIps(lsclient):            
     static_ips_response = lsclient.get_static_ips()
     print ( 'static_ips_response:\n',static_ips_response )
     
 # Allocate a new static IP
-def allocateStaticIp( vStaticIpName_ ):
+def allocateStaticIp( vStaticIpName_, lsclient ):
     allocate_static_ip_resp = ''
     try:
         allocate_static_ip_resp = lsclient.allocate_static_ip(
@@ -111,7 +107,7 @@ def allocateStaticIp( vStaticIpName_ ):
             log.info ( 'StaticIp is created: ' + allocate_static_ip_resp['operations'][0]['resourceName'] )
 
 # Attach a new static IP
-def attachStaticIp( vStaticIpName_, vInstanceName_):            
+def attachStaticIp( vStaticIpName_, vInstanceName_, lsclient):            
     attach_static_ip_resp = ''
     try:
         attach_static_ip_resp = lsclient.attach_static_ip(
@@ -132,7 +128,7 @@ def attachStaticIp( vStaticIpName_, vInstanceName_):
 
             
 # Release the old static IP
-def releaseStaticIp( vStaticIpName_):
+def releaseStaticIp( vStaticIpName_, lsclient):
     release_static_ip_resp = ''
     try:
         release_static_ip_resp = lsclient.release_static_ip(
@@ -231,63 +227,57 @@ def isIpAddressExist(vFilename_,vTargetIp_):
             # log.info('Don\'t find matched ip.')
             return False
 
-def writeIpHistoryFile(vFilename_,vIpAddress_,vTries_, vDNS_name_): 
+def writeIpHistoryFile(vFilename_,vIpAddress_,vTries_): 
     cur_dt = datetime.now().strftime('%Y-%m-%d_%H-%M-%S')
     f = open(vFilename_,"a") 
-    f.write( ','.join( [vIpAddress_, cur_dt, vTries_, vDNS_name_] ) + '\n')
-    # f.write(vIpAddress_ + ',' + cur_dt + ',' + vTries_ + ',' + vDNS_name_ + '\n')
+    f.write( ','.join( [vIpAddress_, cur_dt, vTries_] ) + '\n')
+    # f.write(vIpAddress_ + ',' + cur_dt + ',' + vTries_ +  '\n')
     f.close()    
                 
 def main():
     # cur_dt = datetime.now().strftime('%Y-%m-%d_%H-%M-%S')
     max_retry=3
     vFull_IpHistoryFilename = str(root_path) + os.sep + vIpHistoryFilename
-    for i in range(max_retry):
-        log.info ('\nTime: ' + datetime.now().strftime('%Y-%m-%d %H:%M:%S'))
-        log.info ('======================================')
-        log.info ('*****Static IP before relocation:*****')
-        getStaticIp(vStaticIpName)
-        log.info ('')
-        releaseStaticIp(vStaticIpName)
-        sleep(1)
-        allocateStaticIp(vStaticIpName)
-        attachStaticIp(vStaticIpName, vInstanceName)
-        sleep(1)
-        log.info ('\n****Static IP after relocation:*****')
-        vStaticIP = getStaticIp(vStaticIpName) 
-        # Update respective DNS mapping
-        if (vStaticIP != None and isIpAddressExist(vFull_IpHistoryFilename,vStaticIP) == False):
-            log.info('Static IP is re-allocated successfully.')
-            writeIpHistoryFile(vFull_IpHistoryFilename, vStaticIP, str(i+1), vDNS_name_us)
-            changeDNS( vHostedZoneId, vDNS_name_us, vStaticIP)
-            changeDNS( vHostedZoneId, vDNS_name_main, vStaticIP)
-            changeDNS( vHostedZoneId, vDNS_name_web, vStaticIP)
-            sleep(2)   
-            listDNS_A_record( vHostedZoneId, vDNS_name_us)
-            listDNS_A_record( vHostedZoneId, vDNS_name_main)
-            listDNS_A_record( vHostedZoneId, vDNS_name_web)
-            break
-        # wait for some time for next loop
-        sleep(1)
-    else:
-        log.error('Failed to get a new static IP in ' + str(max_retry) + ' attempts.' )
-        
+    for server in vpn_servers:
+        vStaticIpName = server['static_ip_name'] 
+        vInstanceName = server['instance_name']
+        vRegionName = server['region_name']
+        vDNS_names = server['DNS_names']
+        lsclient = boto3.client('lightsail', region_name=vRegionName )
+        for i in range(max_retry):
+            log.info ('\nTime: ' + datetime.now().strftime('%Y-%m-%d %H:%M:%S'))
+            log.info ('======================================')
+            log.info ('*****Static IP before relocation:*****')
+            getStaticIp(vStaticIpName,lsclient)
+            log.info ('')
+            releaseStaticIp(vStaticIpName, lsclient)
+            sleep(1)
+            allocateStaticIp(vStaticIpName, lsclient)
+            attachStaticIp(vStaticIpName, vInstanceName, lsclient)
+            sleep(1)
+            log.info ('\n****Static IP after relocation:*****')
+            vStaticIP = getStaticIp(vStaticIpName, lsclient) 
+            # Update respective DNS mapping
+            if (vStaticIP != None and isIpAddressExist(vFull_IpHistoryFilename,vStaticIP) == False):
+                log.info('Static IP is re-allocated successfully.')
+                writeIpHistoryFile(vFull_IpHistoryFilename, vStaticIP, str(i+1))
+                for dns in vDNS_names:
+                    changeDNS( vHostedZoneId, dns, vStaticIP)
+                    #changeDNS( vHostedZoneId, vDNS_name_us, vStaticIP)
+                    #changeDNS( vHostedZoneId, vDNS_name_main, vStaticIP)
+                    #changeDNS( vHostedZoneId, vDNS_name_web, vStaticIP)
+                sleep(1)   
+                for dns in vDNS_names:
+                    listDNS_A_record( vHostedZoneId, dns)
+                    #listDNS_A_record( vHostedZoneId, vDNS_name_us)
+                    #listDNS_A_record( vHostedZoneId, vDNS_name_main)
+                    #listDNS_A_record( vHostedZoneId, vDNS_name_web)
+                break
+            # wait for some time for next loop
+            sleep(1)
+        else:
+            log.error('Failed to get a new static IP in ' + str(max_retry) + ' attempts.' )
+            
 if __name__ == '__main__':
-    main();
-        
-''' aws cli commands:
-aws lightsail allocate-static-ip --static-ip-name StaticIp-Oregon-New
-aws lightsail detach-static-ip --static-ip-name StaticIp-Oregon-2
-aws lightsail get-static-ips
-aws lightsail get-instances
-aws lightsail get-instance --instance-name Ubuntu-1GB-Oregon-1
-aws lightsail attach-static-ip --static-ip-name StaticIp-Oregon-New --instance-name Ubuntu-1GB-Oregon-1
-aws lightsail get-static-ips
-aws lightsail get-static-ip --static-ip-name StaticIp-Oregon-New
-aws lightsail release-static-ip --static-ip-name StaticIp-Oregon-2
-aws lightsail get-static-ips
-
-aws route53 list-hosted-zones 
-aws route53 change-resource-record-sets --hosted-zone-id /hostedzone/Z2ZVCN3CYRFI7N --change-batch file://update_A_record.json
-aws route53 list-resource-record-sets --hosted-zone-id /hostedzone/Z2ZVCN3CYRFI7N
-'''
+    main()
+    
