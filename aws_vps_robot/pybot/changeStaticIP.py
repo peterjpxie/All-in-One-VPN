@@ -14,7 +14,7 @@ import ipdb
 
 # Parameters
 # DEBUG_OPTION=1
-log_file = 'changeStaticIP.log' # r'~/logs/changeStaticIP.log' 
+log_file = r'~/logs/changeStaticIP.log' 
 debug_level = logging.INFO
 
 # Application Parameters 
