@@ -52,7 +52,7 @@ log_folder = os.path.dirname(log_file)
 if not os.path.exists(log_folder):
     log_file = os.path.basename(log_file)
 
-logging.basicConfig(filename=log_file, level=debug_level, filemode='w', format='%(asctime)s ln-%(lineno)d %(levelname)s: - %(message)s', datefmt='%Y-%m-%d %H:%M:%S')
+logging.basicConfig(filename=log_file, level=debug_level, filemode='w', format='%(asctime)s ln-%(lineno)d %(levelname)s: %(message)s', datefmt='%Y-%m-%d %H:%M:%S')
 log = logging.getLogger('')
 
 # App root path
