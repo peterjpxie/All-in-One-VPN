@@ -18,13 +18,13 @@ log_file = r'~/logs/changeStaticIP.log'
 debug_level = logging.INFO
 
 # Application Parameters 
-vInstanceName = 'Ubuntu-1GB-Oregon-1'
-vStaticIpName = 'StaticIp-Oregon-Auto'
+# vInstanceName = 'Ubuntu-1GB-Oregon-1'
+# vStaticIpName = 'StaticIp-Oregon-Auto'
 
 vHostedZoneId = '/hostedzone/Z2ZVCN3CYRFI7N'
-vDNS_name_us = 'us.petersvpn.com'
-vDNS_name_main = 'petersvpn.com'
-vDNS_name_web = 'www.petersvpn.com'
+# vDNS_name_us = 'us.petersvpn.com'
+# vDNS_name_main = 'petersvpn.com'
+# vDNS_name_web = 'www.petersvpn.com'
 vIpHistoryFilename = 'static_ip_history.csv'
 vIpHistoryFileColumn = 3
 
@@ -60,7 +60,7 @@ root_path=os.path.dirname(os.path.realpath(__file__))
 
 # boto3.setup_default_session(region_name='us-west-2')
 # lsclient = boto3.client('lightsail')
-lsclient = boto3.client('lightsail', region_name='us-west-2')
+# lsclient = boto3.client('lightsail', region_name='us-west-2')
 rtclient = boto3.client('route53')
 
 
