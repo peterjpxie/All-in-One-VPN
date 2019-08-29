@@ -1,7 +1,7 @@
 #!/bin/sh
 #
 # Script for automatic setup of a VPN server on Ubuntu, supporting IPSec, L2TP, PPTP, OpenVPN.
-# Tested on Digital Ocean, AWS, LightRail cloud VMs.
+# Tested on Digital Ocean, AWS, Lightsail cloud VMs.
 #
 # Copyright (C) 2017 Peter Jiping Xie <peter.jp.xie@gmail.com>
 # Based on the works of following:
