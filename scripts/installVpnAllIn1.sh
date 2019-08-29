@@ -10,8 +10,8 @@
 #   OpenVPN: https://github.com/Nyr/openvpn-install
 
 # History:
-#       2018-08-26: Add Tinyproxy
-#
+#   2018-08-26: Add Tinyproxy
+#   2019-08-29: Remove Tinyproxy
 #
 
 # Assumption:
