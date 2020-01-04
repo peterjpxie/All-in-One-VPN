@@ -37,12 +37,6 @@ vpn_servers = [
         #'DNS_names': ['us.petersvpn.com','petersvpn.com','www.petersvpn.com'],
         'region_name': 'us-west-2'
     },
-    {
-        'instance_name': 'Ubuntu-Sydney-1',
-        'static_ip_name': 'StaticIp-Sydney-Auto',
-        'DNS_names': ['au.petersvpn.com'],
-        'region_name': 'ap-southeast-2'
-    }
     ] 
 
 # logging
