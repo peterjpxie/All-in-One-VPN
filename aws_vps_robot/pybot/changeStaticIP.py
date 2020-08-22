@@ -17,14 +17,7 @@ import ipdb
 log_file = r'~/logs/changeStaticIP.log' 
 debug_level = logging.INFO
 
-# Application Parameters 
-# vInstanceName = 'Ubuntu-1GB-Oregon-1'
-# vStaticIpName = 'StaticIp-Oregon-Auto'
-
 vHostedZoneId = '/hostedzone/Z2ZVCN3CYRFI7N'
-# vDNS_name_us = 'us.petersvpn.com'
-# vDNS_name_main = 'petersvpn.com'
-# vDNS_name_web = 'www.petersvpn.com'
 vIpHistoryFilename = 'static_ip_history.csv'
 vIpHistoryFileColumn = 3
 
