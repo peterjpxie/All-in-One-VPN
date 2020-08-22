@@ -25,8 +25,8 @@ vIpHistoryFileColumn = 3
 vpn_servers = [
     {
         'instance_name': 'Ubuntu-1GB-Oregon-1',
-        'static_ip_name': 'StaticIp-Oregon-Auto',
-        'DNS_names': ['us.petersvpn.com','www.petersvpn.com'],
+        'static_ip_name': 'StaticIp-AU-Auto', #'StaticIp-Oregon-Auto',
+        'DNS_names': ['petersvpn.com','www.petersvpn.com'],
         #'DNS_names': ['us.petersvpn.com','petersvpn.com','www.petersvpn.com'],
         'region_name': 'us-west-2'
     },
