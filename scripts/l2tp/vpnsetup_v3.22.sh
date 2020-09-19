@@ -455,7 +455,7 @@ if ! grep -qs "hwdsl2 VPN script" /etc/rc.local; then
   fi
 cat >> /etc/rc.local <<'EOF'
 
-# Added by hwdsl2 VPN script
+## Added by hwdsl2 VPN script
 (sleep 15
 service ipsec restart
 service xl2tpd restart
