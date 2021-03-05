@@ -17,7 +17,7 @@ import ipdb
 log_file = r'~/logs/changeStaticIP.log' 
 debug_level = logging.INFO
 
-vHostedZoneId = '/hostedzone/Z2ZVCN3CYRFI7N'
+vHostedZoneId = '/hostedzone/Z02665952OL9IVTKNMF30'
 vIpHistoryFilename = 'static_ip_history.csv'
 vIpHistoryFileColumn = 3
 
