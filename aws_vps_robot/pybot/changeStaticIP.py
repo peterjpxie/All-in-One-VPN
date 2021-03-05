@@ -24,10 +24,10 @@ vIpHistoryFileColumn = 3
 # New Application Parameters 
 vpn_servers = [
     {
-        'instance_name': 'Ubuntu-AU1', 
+        'instance_name': 'Ubuntu-AU1-2GB', 
         'static_ip_name': 'StaticIp-AU-Auto', 
-        'DNS_names': ['petersvpn.com','www.petersvpn.com'],
-        #'DNS_names': ['us.petersvpn.com','petersvpn.com','www.petersvpn.com'],
+        'DNS_names': ['pxie.info'],
+        #'DNS_names': ['pxie.info','us.pxie.info'],
         'region_name': 'ap-southeast-2' #'us-west-2'
     },
     ] 
