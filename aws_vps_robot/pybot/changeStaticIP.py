@@ -13,7 +13,7 @@ import logging
 log_file = r'~/logs/changeStaticIP.log' 
 debug_level = logging.INFO
 
-vHostedZoneId = '/hostedzone/Z02665952OL9IVTKNMF30'
+vHostedZoneId = '/hostedzone/Z04791493QXIP3UOKM5E2'
 vIpHistoryFilename = r'~/logs/static_ip_history.csv'
 vIpHistoryFileColumn = 3
 
@@ -22,9 +22,9 @@ vpn_servers = [
     {
         'instance_name': 'Ubuntu-AU1-2GB', 
         'static_ip_name': 'StaticIp-AU-Auto', 
-        'DNS_names': ['pxie.info'],
+        'DNS_names': ['sanpingshui.com'],
         #'DNS_names': ['pxie.info','us.pxie.info'],
-        'region_name': 'ap-southeast-2' #'us-west-2'
+        'region_name': 'ap-southeast-2'
     },
     ] 
 
