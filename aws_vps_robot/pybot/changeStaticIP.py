@@ -1,24 +1,20 @@
-'''
+"""
 Change Static IP for Lightsail VPS automatically and update respective DNS settings
-'''
-# Indent: 4 spaces (Enable tab for 4 spaces in Notepad++ in settings/Preferenes/Languages )
-
+"""
 import boto3
 import json
-from datetime import datetime, time, date
+from datetime import datetime
 from time import sleep
 import numpy as np
 import os
 import logging
-import ipdb
 
-# Parameters
-# DEBUG_OPTION=1
+### Parameters ###
 log_file = r'~/logs/changeStaticIP.log' 
 debug_level = logging.INFO
 
 vHostedZoneId = '/hostedzone/Z02665952OL9IVTKNMF30'
-vIpHistoryFilename = 'static_ip_history.csv'
+vIpHistoryFilename = r'~/logs/static_ip_history.csv'
 vIpHistoryFileColumn = 3
 
 # New Application Parameters 
@@ -32,14 +28,22 @@ vpn_servers = [
     },
     ] 
 
-# logging
-# convert ~ to real path
-log_file = os.path.expanduser(log_file) 
-# if log file folder does not exist, log in current folder
-log_folder = os.path.dirname(log_file)
-if not os.path.exists(log_folder):
-    log_file = os.path.basename(log_file)
+def ensure_file_exists(filename):
+    """ expanduser ~ and convert to current folder if the parent folder does not exist.
+    
+    filename: Full path, e.g. ~/a.py
+    """
+    newfile = os.path.expanduser(filename) 
+    # if the folder does not exist, convert into current folder
+    file_folder = os.path.dirname(newfile)
+    if not os.path.exists(file_folder):
+        newfile = os.path.basename(newfile)
+    return newfile
 
+log_file = ensure_file_exists(log_file)
+vIpHistoryFilename = ensure_file_exists(vIpHistoryFilename) 
+
+# logging
 logging.basicConfig(filename=log_file, level=debug_level, filemode='w', format='%(asctime)s ln-%(lineno)d %(levelname)s: %(message)s', datefmt='%Y-%m-%d %H:%M:%S')
 log = logging.getLogger('')
 
@@ -231,7 +235,6 @@ def writeIpHistoryFile(vFilename_,vIpAddress_,vTries_):
 def main():
     # cur_dt = datetime.now().strftime('%Y-%m-%d_%H-%M-%S')
     max_retry=3
-    vFull_IpHistoryFilename = str(root_path) + os.sep + vIpHistoryFilename
     for server in vpn_servers:
         vStaticIpName = server['static_ip_name'] 
         vInstanceName = server['instance_name']
@@ -251,9 +254,9 @@ def main():
             log.info ('****Static IP after relocation:*****')
             vStaticIP = getStaticIp(vStaticIpName, lsclient) 
             # Update respective DNS mapping
-            if (vStaticIP != None and isIpAddressExist(vFull_IpHistoryFilename,vStaticIP) == False):
+            if (vStaticIP != None and isIpAddressExist(vIpHistoryFilename,vStaticIP) == False):
                 log.info('Static IP is re-allocated successfully.')
-                writeIpHistoryFile(vFull_IpHistoryFilename, vStaticIP, str(i+1))
+                writeIpHistoryFile(vIpHistoryFilename, vStaticIP, str(i+1))
                 for dns in vDNS_names:
                     changeDNS( vHostedZoneId, dns, vStaticIP)
                 sleep(1)
