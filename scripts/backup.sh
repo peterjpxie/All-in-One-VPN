@@ -151,7 +151,9 @@ Restore successfully from $backup_path for the following:
 ~/.bash_aliases
 ~/.ssh/authorized_keys
 
-Note: /etc/rc.local and ~/.bashrc are not touched. Please review and revise manually. 
+Note: 
+/etc/rc.local and ~/.bashrc are not touched. Please review and revise manually. 
+Please also review restored crontab at /var/spool/cron/crontabs/root or 'crontab -l'.
 "
 
 }
