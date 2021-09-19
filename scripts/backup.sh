@@ -1,4 +1,4 @@
-#!/bin/sh
+#!/bin/bash
 # Backup chap-secrets, IPSec passwd, crontab, .bash_aliases, authorized_keys
 
 if [ "$(id -u)" -ne 0 ]; then
@@ -57,6 +57,8 @@ openvpn_bk_fullpath="$backup_path/openvpn"
 crontab_bk_fullname="$backup_path/crontab_root.txt"
 # .bash_aliases
 bash_aliases_bk_fullname="$backup_path/bash_aliases"
+# .bashrc
+bashrc_bk_fullname="$backup_path/bashrc"
 # ssh authorized_keys
 authorized_keys_bk_fullname="$backup_path/authorized_keys"
 # /etc/rc.local
@@ -82,6 +84,9 @@ cp --backup  /var/spool/cron/crontabs/root $crontab_bk_fullname
 # .bash_aliases
 cp --backup ~/.bash_aliases $bash_aliases_bk_fullname
 
+# .bash_aliases
+cp --backup ~/.bashrc $bashrc_bk_fullname
+
 # ssh authorized_keys
 cp --backup ~/.ssh/authorized_keys $authorized_keys_bk_fullname 
 
@@ -94,6 +99,7 @@ echo "Backup successfully at $backup_path for the following:
 /etc/openvpn - may be skipped
 /var/spool/cron/crontabs/root
 ~/.bash_aliases 
+~/.bashrc
 ~/.ssh/authorized_keys
 /etc/rc.local
 "
@@ -125,6 +131,10 @@ cp --backup $crontab_bk_fullname /var/spool/cron/crontabs/root
 cp --backup  $bash_aliases_bk_fullname ~/.bash_aliases
 . ~/.bash_aliases
 
+# .bashrc - restore manually because it may contain details of third party packages like pyenv.
+# cp --backup  $bashrc_bk_fullname ~/.bashrc
+# . ~/.bashrc
+
 # ssh authorized_keys
 cp --backup $authorized_keys_bk_fullname ~/.ssh/authorized_keys 
 
@@ -138,10 +148,10 @@ Restore successfully from $backup_path for the following:
 /etc/ipsec.d/passwd
 /etc/openvpn - may be skipped
 /var/spool/cron/crontabs/root
-~/.bash_aliases 
+~/.bash_aliases
 ~/.ssh/authorized_keys
 
-Note: /etc/rc.local is not touched. Please review and revise manually. 
+Note: /etc/rc.local and ~/.bashrc are not touched. Please review and revise manually. 
 "
 
 }
