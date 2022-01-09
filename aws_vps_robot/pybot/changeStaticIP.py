@@ -20,7 +20,7 @@ vIpHistoryFileColumn = 3
 # New Application Parameters 
 vpn_servers = [
     {
-        'instance_name': 'Ubuntu1', 
+        'instance_name': 'Ubuntu-1', 
         'static_ip_name': 'StaticIp-AU-Auto', 
         'DNS_names': ['sanpingshui.com'],
         'region_name': 'ap-southeast-2'
