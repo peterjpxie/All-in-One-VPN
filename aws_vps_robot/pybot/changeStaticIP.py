@@ -71,14 +71,17 @@ def getStaticIp(vStaticIpName_,lsclient):
         print('Call to get_static_ip failed with exception as below:') 
         print(str(ex))
     
-    #log.info (static_ip_response)
+    #log.info(static_ip_response)
     if static_ip_response != '':
         if str(static_ip_response['ResponseMetadata']['HTTPStatusCode']) == '200':
             log.info ( 'staticIp name: ' + static_ip_response['staticIp']['name'] )
             log.info ( 'staticIp ipAddress: ' + static_ip_response['staticIp']['ipAddress'] )
             log.info ( 'Attached to: ' + static_ip_response['staticIp']['attachedTo'] ) 
             return static_ip_response['staticIp']['ipAddress'] 
-    
+        else:
+            log.error('Failed to get static ip with response: %s' % static_ip_response )
+    else:
+        log.error('Failed to get static ip with response: %s' % static_ip_response )    
 
 def getStaticIps(lsclient):            
     static_ips_response = lsclient.get_static_ips()
@@ -95,13 +98,17 @@ def allocateStaticIp( vStaticIpName_, lsclient ):
         print('Call to allocate_static_ip failed with exception as below:') 
         print(str(ex))
     
-    # log.info (allocate_static_ip_resp)
+    log.debug(allocate_static_ip_resp)
     
     if allocate_static_ip_resp != '':
         if (str(allocate_static_ip_resp['ResponseMetadata']['HTTPStatusCode']) == '200' and
             str(allocate_static_ip_resp['operations'][0]['status']) == 'Succeeded'):
             # log.info ( 'region Name: ' + allocate_static_ip_resp['operations'][0]['location']['regionName'] )
             log.info ( 'StaticIp is created: ' + allocate_static_ip_resp['operations'][0]['resourceName'] )
+        else:
+            log.error('Failed to allocate static ip with response: %s' % allocate_static_ip_resp )
+    else:
+        log.error('Failed to allocate static ip with response: %s' % allocate_static_ip_resp )
 
 # Attach a new static IP
 def attachStaticIp( vStaticIpName_, vInstanceName_, lsclient):            
@@ -115,15 +122,18 @@ def attachStaticIp( vStaticIpName_, vInstanceName_, lsclient):
         print('Call to attach_static_ip failed with exception as below:') 
         print(str(ex))
     
-    # log.info (attach_static_ip_resp)
+    log.debug(attach_static_ip_resp)
 
     if attach_static_ip_resp != '':
         if (str(attach_static_ip_resp['ResponseMetadata']['HTTPStatusCode']) == '200' and
             str(attach_static_ip_resp['operations'][0]['status']) == 'Succeeded'):
             # log.info ( 'region Name: ' + allocate_static_ip_resp['operations'][0]['location']['regionName'] )
             log.info ( 'StaticIp is attached to: ' + attach_static_ip_resp['operations'][0]['operationDetails'] )
+        else:
+            log.error('Failed to attach static ip with response: %s' % attach_static_ip_resp )
+    else:
+        log.error('Failed to attach static ip with response: %s' % attach_static_ip_resp )
 
-            
 # Release the old static IP
 def releaseStaticIp( vStaticIpName_, lsclient):
     release_static_ip_resp = ''
@@ -135,12 +145,16 @@ def releaseStaticIp( vStaticIpName_, lsclient):
         print('Call to release_static_ip failed with exception as below:') 
         print(str(ex))
     
-    #log.info (release_static_ip_resp)
+    log.debug(release_static_ip_resp)
  
     if release_static_ip_resp != '':
         if (str(release_static_ip_resp['ResponseMetadata']['HTTPStatusCode']) == '200' and
             str(release_static_ip_resp['operations'][0]['status']) == 'Succeeded'):
             log.info ( 'StaticIp is released: ' + release_static_ip_resp['operations'][0]['resourceName'] )
+        else:
+            log.error('Failed to release static ip with response: %s' % release_static_ip_resp )
+    else:
+        log.error('Failed to release static ip with response: %s' % release_static_ip_resp )
 
 # Change DNS A record
 def changeDNS( vHostedZoneId_, vDNS_name_, vIpAddress_):    
