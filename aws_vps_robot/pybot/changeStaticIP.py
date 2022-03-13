@@ -113,9 +113,7 @@ def getStaticIp(vStaticIpName_,lsclient):
             log.info ( 'Attached to: ' + static_ip_response['staticIp']['attachedTo'] ) 
             return static_ip_response['staticIp']['ipAddress'] 
         else:
-            log.error('Failed to get static ip with response: %s' % static_ip_response )
-    else:
-        log.error('Failed to get static ip with response: %s' % static_ip_response )    
+            log.error('Failed to get static ip with response: %s' % static_ip_response )  
 
 def getStaticIps(lsclient):            
     static_ips_response = lsclient.get_static_ips()
@@ -141,8 +139,6 @@ def allocateStaticIp( vStaticIpName_, lsclient ):
             log.info ( 'StaticIp is created: ' + allocate_static_ip_resp['operations'][0]['resourceName'] )
         else:
             log.error('Failed to allocate static ip with response: %s' % allocate_static_ip_resp )
-    else:
-        log.error('Failed to allocate static ip with response: %s' % allocate_static_ip_resp )
 
 # Attach a new static IP
 def attachStaticIp( vStaticIpName_, vInstanceName_, lsclient):            
@@ -165,8 +161,6 @@ def attachStaticIp( vStaticIpName_, vInstanceName_, lsclient):
             log.info ( 'StaticIp is attached to: ' + attach_static_ip_resp['operations'][0]['operationDetails'] )
         else:
             log.error('Failed to attach static ip with response: %s' % attach_static_ip_resp )
-    else:
-        log.error('Failed to attach static ip with response: %s' % attach_static_ip_resp )
 
 # Release the old static IP
 def releaseStaticIp( vStaticIpName_, lsclient):
@@ -187,8 +181,6 @@ def releaseStaticIp( vStaticIpName_, lsclient):
             log.info ( 'StaticIp is released: ' + release_static_ip_resp['operations'][0]['resourceName'] )
         else:
             log.error('Failed to release static ip with response: %s' % release_static_ip_resp )
-    else:
-        log.error('Failed to release static ip with response: %s' % release_static_ip_resp )
 
 # Change DNS A record
 def changeDNS( vHostedZoneId_, vDNS_name_, vIpAddress_):    
@@ -217,6 +209,7 @@ def changeDNS( vHostedZoneId_, vDNS_name_, vIpAddress_):
         ) 
         
     except Exception as ex:
+        log.error('changeDNS failed.')
         log.error('Call to change_resource_record_sets failed with exception as below:') 
         log.error(str(ex))
     
@@ -227,8 +220,6 @@ def changeDNS( vHostedZoneId_, vDNS_name_, vIpAddress_):
             log.info ( 'DNS is being updated: ' + vDNS_name_ + ' - ' + vIpAddress_ )
         else:
             log.error('Failed to update DNS with response: %s' % release_static_ip_resp )
-    else:
-        log.error('Failed to update DNS with response: %s' % release_static_ip_resp )
 
 # List DNS A record
 def listDNS_A_record( vHostedZoneId_, vSubDomainName_):  
