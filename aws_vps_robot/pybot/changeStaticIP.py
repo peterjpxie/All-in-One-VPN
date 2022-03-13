@@ -1,3 +1,4 @@
+#!/usr/bin/env python3
 """
 Change Static IP for Lightsail VPS automatically and update respective DNS settings
 """
@@ -8,6 +9,8 @@ from time import sleep
 import numpy as np
 import os
 import logging
+import traceback
+import sys
 
 ### Parameters ###
 log_file = r'~/logs/changeStaticIP.log' 
@@ -60,6 +63,37 @@ def writeFile(filename, strText):
     f.write(strText)
     f.close()
 
+def send_email(to, subject, contents):
+    """  send email with gmail account defined in ~/.yagmail.
+
+    contents: e.g. ['mail body content','pytest.ini','a.py']
+    to: e.g. 'peter.jp.xie@gmail.com'
+    
+    https://github.com/kootenpv/yagmail
+    """
+    import yagmail
+    user = 'xiejiping@gmail.com'
+    
+    # read password
+    gmail_config = {}
+    with open(os.path.expanduser('~/.yagmail'))as f:
+        for line in f:
+            if '=' in line:
+                key, value = line.split('=')
+                key, value = key.strip(), value.strip()
+                gmail_config[key] = value
+    assert 'token' in gmail_config
+
+    password = gmail_config['token']
+
+    try:
+        with yagmail.SMTP(user, password) as yag:
+            yag.send(to,subject,contents)
+        log.info('Sent email successfully')
+    except Exception as e:
+       log.error(traceback.print_exc())
+       log.error('***Failed to send email***')
+
 def getStaticIp(vStaticIpName_,lsclient):
     static_ip_response = ''
     try: 
@@ -68,10 +102,10 @@ def getStaticIp(vStaticIpName_,lsclient):
         staticIpName = vStaticIpName_
         )
     except Exception as ex:
-        print('Call to get_static_ip failed with exception as below:') 
-        print(str(ex))
+        log.error('Call to get_static_ip failed with exception as below:') 
+        log.error(str(ex))
     
-    #log.info(static_ip_response)
+    log.debug(static_ip_response)
     if static_ip_response != '':
         if str(static_ip_response['ResponseMetadata']['HTTPStatusCode']) == '200':
             log.info ( 'staticIp name: ' + static_ip_response['staticIp']['name'] )
@@ -85,7 +119,7 @@ def getStaticIp(vStaticIpName_,lsclient):
 
 def getStaticIps(lsclient):            
     static_ips_response = lsclient.get_static_ips()
-    print ( 'static_ips_response:\n',static_ips_response )
+    log.info ( 'static_ips_response:\n',static_ips_response )
     
 # Allocate a new static IP
 def allocateStaticIp( vStaticIpName_, lsclient ):
@@ -95,8 +129,8 @@ def allocateStaticIp( vStaticIpName_, lsclient ):
             staticIpName = vStaticIpName_ 
         )
     except Exception as ex:
-        print('Call to allocate_static_ip failed with exception as below:') 
-        print(str(ex))
+        log.error('Call to allocate_static_ip failed with exception as below:') 
+        log.error(str(ex))
     
     log.debug(allocate_static_ip_resp)
     
@@ -119,8 +153,8 @@ def attachStaticIp( vStaticIpName_, vInstanceName_, lsclient):
             instanceName = vInstanceName_ 
         )
     except Exception as ex:
-        print('Call to attach_static_ip failed with exception as below:') 
-        print(str(ex))
+        log.error('Call to attach_static_ip failed with exception as below:') 
+        log.error(str(ex))
     
     log.debug(attach_static_ip_resp)
 
@@ -183,14 +217,18 @@ def changeDNS( vHostedZoneId_, vDNS_name_, vIpAddress_):
         ) 
         
     except Exception as ex:
-        print('Call to change_resource_record_sets failed with exception as below:') 
-        print(str(ex))
+        log.error('Call to change_resource_record_sets failed with exception as below:') 
+        log.error(str(ex))
     
     # log.info (change_resource_record_sets_resp)
     if change_resource_record_sets_resp != '':
         if (str(change_resource_record_sets_resp['ResponseMetadata']['HTTPStatusCode']) == '200' and
             str(change_resource_record_sets_resp['ChangeInfo']['Status']) == 'PENDING'):
             log.info ( 'DNS is being updated: ' + vDNS_name_ + ' - ' + vIpAddress_ )
+        else:
+            log.error('Failed to update DNS with response: %s' % release_static_ip_resp )
+    else:
+        log.error('Failed to update DNS with response: %s' % release_static_ip_resp )
 
 # List DNS A record
 def listDNS_A_record( vHostedZoneId_, vSubDomainName_):  
@@ -201,8 +239,8 @@ def listDNS_A_record( vHostedZoneId_, vSubDomainName_):
             HostedZoneId = vHostedZoneId_        
         ) 
     except Exception as ex:
-        print('Call to list_resource_record_sets failed with exception as below:') 
-        print(str(ex))
+        log.error('Call to list_resource_record_sets failed with exception as below:') 
+        log.error(str(ex))
     
     # log.info (list_resource_record_sets_resp)
     
@@ -282,6 +320,12 @@ def main():
         else:
             log.error('Failed to get a new static IP in ' + str(max_retry) + ' attempts.' )
             
+    # send email for failures
+    with open(os.path.expanduser(log_file)) as f:
+        log_content = f.read()
+        if 'error' in log_content.lower() or 'info' in log_content.lower():
+            send_email('peter.jp.xie@gmail.com','Static IP Relocation Failed', log_content)
+
 if __name__ == '__main__':
     main()
     
