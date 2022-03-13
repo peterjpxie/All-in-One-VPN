@@ -284,6 +284,7 @@ def writeIpHistoryFile(vFilename_,vIpAddress_,vTries_):
     f.close()    
                 
 def main():
+    print('Start changing IP')
     # cur_dt = datetime.now().strftime('%Y-%m-%d_%H-%M-%S')
     max_retry=3
     for server in vpn_servers:
@@ -325,6 +326,7 @@ def main():
         log_content = f.read()
         if 'error' in log_content.lower():
             send_email('peter.jp.xie@gmail.com','Static IP Relocation Failed', log_content)
+    print('Done')
 
 if __name__ == '__main__':
     main()
