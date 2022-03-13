@@ -298,10 +298,10 @@ def main():
             log.info ('*****Static IP before relocation:*****')
             getStaticIp(vStaticIpName,lsclient)
             releaseStaticIp(vStaticIpName, lsclient)
-            sleep(1)
+            sleep(3) # sleep to avoid previous static ip name not fully ready
             allocateStaticIp(vStaticIpName, lsclient)
             attachStaticIp(vStaticIpName, vInstanceName, lsclient)
-            sleep(1)
+            sleep(2)
             log.info ('****Static IP after relocation:*****')
             vStaticIP = getStaticIp(vStaticIpName, lsclient) 
             # Update respective DNS mapping
@@ -310,7 +310,7 @@ def main():
                 writeIpHistoryFile(vIpHistoryFilename, vStaticIP, str(i+1))
                 for dns in vDNS_names:
                     changeDNS( vHostedZoneId, dns, vStaticIP)
-                sleep(1)
+                sleep(2)
                 # check
                 for dns in vDNS_names:
                     listDNS_A_record( vHostedZoneId, dns)
@@ -323,7 +323,7 @@ def main():
     # send email for failures
     with open(os.path.expanduser(log_file)) as f:
         log_content = f.read()
-        if 'error' in log_content.lower() or 'info' in log_content.lower():
+        if 'error' in log_content.lower():
             send_email('peter.jp.xie@gmail.com','Static IP Relocation Failed', log_content)
 
 if __name__ == '__main__':
