@@ -290,7 +290,7 @@ def main():
             log.info ('*****Static IP before relocation:*****')
             getStaticIp(vStaticIpName,lsclient)
             releaseStaticIp(vStaticIpName, lsclient)
-            sleep(3) # sleep to avoid previous static ip name not fully ready
+            sleep(5) # sleep to avoid previous static ip name not fully ready
             allocateStaticIp(vStaticIpName, lsclient)
             attachStaticIp(vStaticIpName, vInstanceName, lsclient)
             sleep(2)
