@@ -1,1 +1,0 @@
-vpnsetup_v3.22.sh

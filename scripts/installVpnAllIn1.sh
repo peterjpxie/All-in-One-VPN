@@ -1,11 +1,11 @@
 #!/bin/sh
 #
-# Script for automatic setup of a VPN server on Ubuntu, supporting IPSec, L2TP, PPTP, OpenVPN.
+# Script for automatic setup of a VPN server on Ubuntu, supporting IPSec, L2TP, PPTP, IKEv2 and OpenVPN.
 # Tested on Digital Ocean, AWS, Lightsail cloud VMs.
 #
 # Copyright (C) 2017 Peter Jiping Xie <peter.jp.xie@gmail.com>
 # Based on the works of following:
-# 	IPSec / L2TP:  https://github.com/hwdsl2/setup-ipsec-vpn
+# 	IPSec / L2TP / IKEv2:  https://github.com/hwdsl2/setup-ipsec-vpn
 # 	PPTP: https://github.com/viljoviitanen/setup-simple-pptp-vpn
 #   OpenVPN: https://github.com/Nyr/openvpn-install
 
@@ -49,7 +49,7 @@ done
 
 if [ "$option" = "" ]; then
 echo "What do you want to do?"
-echo "   1) Install all VPN services: PPTP, IPSec, L2TP, OpenVPN"
+echo "   1) Install all VPN services: PPTP, IPSec, L2TP, IKEv2 and OpenVPN"
 echo "   2) Install all VPN services except OpenVPN"
 echo "   3) Exit"
 read -p "Select an option [1-3]: " option
@@ -66,9 +66,24 @@ esac
 path_of_mainScript=`dirname $0`
 #echo path_of_mainScript $path_of_mainScript
 
-# Install VPNs
-sh ${path_of_mainScript}/l2tp/vpnsetup.sh
-sh ${path_of_mainScript}/pptp/setup.sh
+### Install VPNs ###
+
+## IPSec, L2TP, IKEv2 with https://github.com/hwdsl2/setup-ipsec-vpn
+# IPSec, L2TP settings:
+export VPN_IPSEC_PSK=petersvpn
+export VPN_USER=peter
+export VPN_PASSWORD=peter
+
+# IKEv2
+#Advanced users can optionally specify a DNS name for the IKEv2 server address. The DNS name must be a fully qualified domain name (FQDN). Example:
+export VPN_DNS_NAME=sanpingshui.com
+# Similarly, you may specify a name for the first IKEv2 client. The default is vpnclient if not specified.
+export VPN_CLIENT_NAME=peter
+
+bash ${path_of_mainScript}/ipsec/vpnsetup_ubuntu_latest.sh
+
+# pptp - insecure old school protocol
+bash ${path_of_mainScript}/pptp/setup.sh
 # sh ${path_of_mainScript}/tinyproxy/setup_tinyproxy.sh
 
 if [ "$option" != "2" ] ; then
