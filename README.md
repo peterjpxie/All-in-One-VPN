@@ -1,5 +1,5 @@
 # All-in-One-VPN
-One script to install all VPN applications: PPTP, IPSec, L2TP, IKEv2,OpenVPN.
+One script to install all VPN applications: PPTP, IPSec, L2TP, IKEv2 and OpenVPN.
 
 And re-allocate server static IP and change DNS mapping automatically by AWS python API.
 
