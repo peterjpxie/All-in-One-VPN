@@ -71,7 +71,7 @@ if ! grep -qs "Added by PPTP VPN script" /etc/rc.local; then
 #ubuntu has exit 0 at the end of the file.
 sed -i '/^exit 0/d' /etc/rc.local
 
-cat >> /etc/rc.local << END
+cat >> /etc/rc.local << 'END'
 
 ## Added by PPTP VPN script
 echo 1 > /proc/sys/net/ipv4/ip_forward
@@ -87,6 +87,8 @@ iptables -I FORWARD -s 192.168.2.0/24 -p tcp -m tcp --tcp-flags FIN,SYN,RST,ACK 
 
 # start PPTP service on bootup
 service pptpd start
+
+## End - PPTP VPN script
 
 exit 0
 END
