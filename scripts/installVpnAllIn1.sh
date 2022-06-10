@@ -68,7 +68,22 @@ path_of_mainScript=`dirname $0`
 
 ### Install VPNs ###
 
+## pptp - insecure old school protocol
+echo "=====================Installing pptp==========================="
+echo ""
+bash ${path_of_mainScript}/pptp/setup.sh
+# sh ${path_of_mainScript}/tinyproxy/setup_tinyproxy.sh
+
+## openvpn
+if [ "$option" != "2" ] ; then
+echo "=====================Installing openvpn==========================="
+echo ""
+bash ${path_of_mainScript}/openvpn/openvpn-install.sh
+fi
+
 ## IPSec, L2TP, IKEv2 with https://github.com/hwdsl2/setup-ipsec-vpn
+echo "=====================Installing IPSec, L2TP, IKEv2==========================="
+echo ""
 # IPSec, L2TP settings:
 export VPN_IPSEC_PSK=petersvpn
 export VPN_USER=peter
@@ -82,16 +97,8 @@ export VPN_CLIENT_NAME=peter
 
 bash ${path_of_mainScript}/ipsec/vpnsetup_ubuntu_latest.sh
 
-# pptp - insecure old school protocol
-bash ${path_of_mainScript}/pptp/setup.sh
-# sh ${path_of_mainScript}/tinyproxy/setup_tinyproxy.sh
 
-# openvpn
-if [ "$option" != "2" ] ; then
-bash ${path_of_mainScript}/openvpn/openvpn-install.sh
-fi
-
-####### Customized Setup for my own server ########
+### Customized Setup for my own server ###
 # Perform backup restore first, then SetVPNServer so AWS root authorized_keys is replaced with backup one. 
 
 # Check if backup files exist
@@ -116,6 +123,11 @@ fi
 echo "===============================================================================
 Congrats! VPN servers are ready.
 PSK (IPSec / L2TP): ${VPN_IPSEC_PSK}
+IKEv2 client profiles:
+  ~/peter.p12 (for Windows & Linux)
+  ~/peter.sswan (for Android)
+  ~/peter.mobileconfig (for iOS & macOS)
+  
 To create VPN users for PPTP, IPSec, L2TP, run ./manageuser.sh.
 To create VPN client profiles for OpenVPN, run ./openvpn/openvpn-install.sh.
 ==============================================================================="
