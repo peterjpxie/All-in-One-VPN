@@ -123,11 +123,12 @@ fi
 echo "===============================================================================
 Congrats! VPN servers are ready.
 PSK (IPSec / L2TP): ${VPN_IPSEC_PSK}
+IKEv2 server DNS name: ${VPN_DNS_NAME} - Hardcoded in script
 IKEv2 client profiles:
   ~/peter.p12 (for Windows & Linux)
   ~/peter.sswan (for Android)
   ~/peter.mobileconfig (for iOS & macOS)
-  
+
 To create VPN users for PPTP, IPSec, L2TP, run ./manageuser.sh.
 To create VPN client profiles for OpenVPN, run ./openvpn/openvpn-install.sh.
 ==============================================================================="
