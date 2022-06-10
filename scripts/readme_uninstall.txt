@@ -1,6 +1,6 @@
-Note: scripts/uninstall.sh to uninstall ALL VPN services is not up to date to remove ipsec ones (L2TP/IKEv2 etc.).
-
+Notes:
 If internal IP is changed, need to reinstall the VPN services.
+
 
 ipsec / l2tp / IKEv2
 --------------------
