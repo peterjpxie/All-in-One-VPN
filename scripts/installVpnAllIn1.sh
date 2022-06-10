@@ -74,7 +74,7 @@ export VPN_IPSEC_PSK=petersvpn
 export VPN_USER=peter
 export VPN_PASSWORD=peter
 
-# IKEv2
+# IKEv2 settings:
 #Advanced users can optionally specify a DNS name for the IKEv2 server address. The DNS name must be a fully qualified domain name (FQDN). Example:
 export VPN_DNS_NAME=sanpingshui.com
 # Similarly, you may specify a name for the first IKEv2 client. The default is vpnclient if not specified.
@@ -86,6 +86,7 @@ bash ${path_of_mainScript}/ipsec/vpnsetup_ubuntu_latest.sh
 bash ${path_of_mainScript}/pptp/setup.sh
 # sh ${path_of_mainScript}/tinyproxy/setup_tinyproxy.sh
 
+# openvpn
 if [ "$option" != "2" ] ; then
 bash ${path_of_mainScript}/openvpn/openvpn-install.sh
 fi
@@ -114,7 +115,7 @@ fi
 #tinyproxy_port=$(egrep "^Port " /etc/tinyproxy.conf |awk '{print $2}')
 echo "===============================================================================
 Congrats! VPN servers are ready.
-PSK (IPSec / L2TP): petersvpn
+PSK (IPSec / L2TP): ${VPN_IPSEC_PSK}
 To create VPN users for PPTP, IPSec, L2TP, run ./manageuser.sh.
 To create VPN client profiles for OpenVPN, run ./openvpn/openvpn-install.sh.
 ==============================================================================="
