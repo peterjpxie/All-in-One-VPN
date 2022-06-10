@@ -5,9 +5,6 @@ And re-allocate server static IP and change DNS mapping automatically by AWS pyt
 
 Check [wiki](https://github.com/peterjpxie/All-in-One-VPN/wiki) for details.
 
-## Firewall Settings
-* IPSec / L2TP: UDP 500, 4500, 1701
-* PPTP:         TCP 1723
 
   
 
