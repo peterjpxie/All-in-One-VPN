@@ -66,7 +66,7 @@ def writeFile(filename, strText):
 def send_email(to, subject, contents):
     """  send email with gmail account defined in ~/.yagmail.
 
-    contents: e.g. ['mail body content','pytest.ini','a.py']
+    contents: e.g. 'body content' or ['mail body content','pytest.ini','a.py']
     to: e.g. 'peter.jp.xie@gmail.com'
     
     https://github.com/kootenpv/yagmail
@@ -308,10 +308,20 @@ def main():
                     listDNS_A_record( vHostedZoneId, dns)
                 break
             # wait for some time for next loop
-            sleep(1)
+            sleep(3)
         else:
-            log.error('Failed to get a new static IP in ' + str(max_retry) + ' attempts.' )
-            
+            # still need to update DNS if new IP is allocated but exists in the history
+            if (vStaticIP != None and isIpAddressExist(vIpHistoryFilename,vStaticIP) == True):
+                log.info('Static IP is re-allocated but exists in the history.')
+                for dns in vDNS_names:
+                    changeDNS( vHostedZoneId, dns, vStaticIP)
+                sleep(2)
+                # check
+                for dns in vDNS_names:
+                    listDNS_A_record( vHostedZoneId, dns)
+
+            log.error('Failed to get a new static IP in %s attempts.' % max_retry)
+                      
     # send email for failures
     with open(os.path.expanduser(log_file)) as f:
         log_content = f.read()
