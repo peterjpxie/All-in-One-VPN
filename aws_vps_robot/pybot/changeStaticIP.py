@@ -330,5 +330,5 @@ def main():
     print('Done')
 
 if __name__ == '__main__':
-    main()
-    
+    # main()
+    send_email('peter.jp.xie@gmail.com','Static IP Relocation Failed', 'test')
