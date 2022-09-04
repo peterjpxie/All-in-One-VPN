@@ -3,14 +3,12 @@
 Change Static IP for Lightsail VPS automatically and update respective DNS settings
 """
 import boto3
-import json
 from datetime import datetime
 from time import sleep
 import numpy as np
 import os
 import logging
 import traceback
-import sys
 
 ### Parameters ###
 log_file = r'~/logs/changeStaticIP.log' 
@@ -91,7 +89,7 @@ def send_email(to, subject, contents):
             yag.send(to,subject,contents)
         log.info('Sent email successfully')
     except Exception as e:
-       log.error(traceback.print_exc())
+       log.error(traceback.format_exc())
        log.error('***Failed to send email***')
 
 def getStaticIp(vStaticIpName_,lsclient):
@@ -330,5 +328,4 @@ def main():
     print('Done')
 
 if __name__ == '__main__':
-    # main()
-    send_email('peter.jp.xie@gmail.com','Static IP Relocation Failed', 'test')
+    main()
