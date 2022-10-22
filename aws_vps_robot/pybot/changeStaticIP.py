@@ -102,6 +102,7 @@ def getStaticIp(vStaticIpName_,lsclient):
     except Exception as ex:
         log.error('Call to get_static_ip failed with exception as below:') 
         log.error(str(ex))
+        return ex
     
     log.debug(static_ip_response)
     if static_ip_response != '':
@@ -112,10 +113,6 @@ def getStaticIp(vStaticIpName_,lsclient):
             return static_ip_response['staticIp']['ipAddress'] 
         else:
             log.error('Failed to get static ip with response: %s' % static_ip_response )  
-
-def getStaticIps(lsclient):            
-    static_ips_response = lsclient.get_static_ips()
-    log.info ( 'static_ips_response:\n',static_ips_response )
     
 # Allocate a new static IP
 def allocateStaticIp( vStaticIpName_, lsclient ):
@@ -127,6 +124,7 @@ def allocateStaticIp( vStaticIpName_, lsclient ):
     except Exception as ex:
         log.error('Call to allocate_static_ip failed with exception as below:') 
         log.error(str(ex))
+        return ex
     
     log.debug(allocate_static_ip_resp)
     
@@ -139,7 +137,7 @@ def allocateStaticIp( vStaticIpName_, lsclient ):
             log.error('Failed to allocate static ip with response: %s' % allocate_static_ip_resp )
 
 # Attach a new static IP
-def attachStaticIp( vStaticIpName_, vInstanceName_, lsclient):            
+def attachStaticIp(vStaticIpName_, vInstanceName_, lsclient):            
     attach_static_ip_resp = ''
     try:
         attach_static_ip_resp = lsclient.attach_static_ip(
@@ -149,6 +147,7 @@ def attachStaticIp( vStaticIpName_, vInstanceName_, lsclient):
     except Exception as ex:
         log.error('Call to attach_static_ip failed with exception as below:') 
         log.error(str(ex))
+        return ex
     
     log.debug(attach_static_ip_resp)
 
@@ -170,6 +169,7 @@ def releaseStaticIp( vStaticIpName_, lsclient):
     except Exception as ex:
         print('Call to release_static_ip failed with exception as below:') 
         print(str(ex))
+        return ex
     
     log.debug(release_static_ip_resp)
  
@@ -210,6 +210,7 @@ def changeDNS( vHostedZoneId_, vDNS_name_, vIpAddress_):
         log.error('changeDNS failed.')
         log.error('Call to change_resource_record_sets failed with exception as below:') 
         log.error(str(ex))
+        return ex
     
     # log.info (change_resource_record_sets_resp)
     if change_resource_record_sets_resp != '':
@@ -230,6 +231,7 @@ def listDNS_A_record( vHostedZoneId_, vSubDomainName_):
     except Exception as ex:
         log.error('Call to list_resource_record_sets failed with exception as below:') 
         log.error(str(ex))
+        return ex
     
     # log.info (list_resource_record_sets_resp)
     
@@ -284,13 +286,19 @@ def main():
         lsclient = boto3.client('lightsail', region_name=vRegionName )
         for i in range(max_retry):
             # log.info ('Time: ' + datetime.now().strftime('%Y-%m-%d %H:%M:%S'))
-            log.info ('======================================')
+            log.info ('=================Attempt %s=====================' % (i+1))
             log.info ('*****Static IP before relocation:*****')
-            getStaticIp(vStaticIpName,lsclient)
-            releaseStaticIp(vStaticIpName, lsclient)
+            ret = getStaticIp(vStaticIpName,lsclient)
+            if isinstance(ret,Exception):
+                log.error('Failed to rotate IP with exception.')
+                continue
+            ret = releaseStaticIp(vStaticIpName, lsclient)
+            if isinstance(ret,Exception):
+                log.error('Failed to rotate IP with exception.')
+                continue            
             sleep(5) # sleep to avoid previous static ip name not fully ready
-            allocateStaticIp(vStaticIpName, lsclient)
-            attachStaticIp(vStaticIpName, vInstanceName, lsclient)
+            ret = allocateStaticIp(vStaticIpName, lsclient)
+            ret = attachStaticIp(vStaticIpName, vInstanceName, lsclient)
             sleep(2)
             log.info ('****Static IP after relocation:*****')
             vStaticIP = getStaticIp(vStaticIpName, lsclient) 
