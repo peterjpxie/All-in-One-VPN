@@ -17,6 +17,7 @@ debug_level = logging.INFO
 vHostedZoneId = '/hostedzone/Z04791493QXIP3UOKM5E2'
 vIpHistoryFilename = r'~/logs/static_ip_history.csv'
 vIpHistoryFileColumn = 3
+Wait_Secs_Before_Retry = 2
 
 # New Application Parameters 
 vpn_servers = [
@@ -54,12 +55,6 @@ root_path=os.path.dirname(os.path.realpath(__file__))
 # lsclient = boto3.client('lightsail')
 # lsclient = boto3.client('lightsail', region_name='us-west-2')
 rtclient = boto3.client('route53')
-
-
-def writeFile(filename, strText):
-    f = open(filename,'w') # nuke or create the file !
-    f.write(strText)
-    f.close()
 
 def send_email(to, subject, contents):
     """  send email with gmail account defined in ~/.yagmail.
@@ -218,7 +213,7 @@ def changeDNS( vHostedZoneId_, vDNS_name_, vIpAddress_):
             str(change_resource_record_sets_resp['ChangeInfo']['Status']) == 'PENDING'):
             log.info ( 'DNS is being updated: ' + vDNS_name_ + ' - ' + vIpAddress_ )
         else:
-            log.error('Failed to update DNS with response: %s' % release_static_ip_resp )
+            log.error('Failed to update DNS with response: %s' % change_resource_record_sets_resp )
 
 # List DNS A record
 def listDNS_A_record( vHostedZoneId_, vSubDomainName_):  
@@ -283,28 +278,38 @@ def main():
         vInstanceName = server['instance_name']
         vRegionName = server['region_name']
         vDNS_names = server['DNS_names']
-        lsclient = boto3.client('lightsail', region_name=vRegionName )
+        lsclient = boto3.client('lightsail', region_name=vRegionName)
+        change_ip_success = False # update to True once successful
         for i in range(max_retry):
             # log.info ('Time: ' + datetime.now().strftime('%Y-%m-%d %H:%M:%S'))
             log.info ('=================Attempt %s=====================' % (i+1))
             log.info ('*****Static IP before relocation:*****')
             ret = getStaticIp(vStaticIpName,lsclient)
             if isinstance(ret,Exception):
-                log.error('Failed to rotate IP with exception.')
+                log.error('Failed to rotate IP with exception at getStaticIp.')
+                sleep(Wait_Secs_Before_Retry)
                 continue
             ret = releaseStaticIp(vStaticIpName, lsclient)
             if isinstance(ret,Exception):
-                log.error('Failed to rotate IP with exception.')
+                log.error('Failed to rotate IP with exception at releaseStaticIp.')
+                sleep(Wait_Secs_Before_Retry)
                 continue            
             sleep(5) # sleep to avoid previous static ip name not fully ready
             ret = allocateStaticIp(vStaticIpName, lsclient)
+            if isinstance(ret,Exception):
+                log.critical('Failed to allocate static ip for %s, give up!' % vInstanceName) 
+                break                
             ret = attachStaticIp(vStaticIpName, vInstanceName, lsclient)
-            sleep(2)
+            if isinstance(ret,Exception):
+                log.critical('Failed to attach static ip %s to instace %s, give up!' % (vStaticIpName,vInstanceName))
+                break
+            sleep(2) # wait to take effect
             log.info ('****Static IP after relocation:*****')
             vStaticIP = getStaticIp(vStaticIpName, lsclient) 
             # Update respective DNS mapping
             if (vStaticIP != None and isIpAddressExist(vIpHistoryFilename,vStaticIP) == False):
                 log.info('Static IP is re-allocated successfully.')
+                change_ip_success = True
                 writeIpHistoryFile(vIpHistoryFilename, vStaticIP, str(i+1))
                 for dns in vDNS_names:
                     changeDNS( vHostedZoneId, dns, vStaticIP)
@@ -313,9 +318,11 @@ def main():
                 for dns in vDNS_names:
                     listDNS_A_record( vHostedZoneId, dns)
                 break
-            # wait for some time for next loop
-            sleep(3)
-        else:
+            # wait for some time for next attempt
+            sleep(Wait_Secs_Before_Retry)
+
+        # fails to change ip
+        if change_ip_success is False:
             # still need to update DNS if new IP is allocated but exists in the history
             if (vStaticIP != None and isIpAddressExist(vIpHistoryFilename,vStaticIP) == True):
                 log.info('Static IP is re-allocated but exists in the history.')
@@ -331,7 +338,7 @@ def main():
     # send email for failures
     with open(os.path.expanduser(log_file)) as f:
         log_content = f.read()
-        if 'error' in log_content.lower():
+        if 'error' in log_content.lower() or 'critical' in log_content.lower():
             send_email('peter.jp.xie@gmail.com','Static IP Relocation Failed', log_content)
     print('Done')
 
