@@ -1,6 +1,13 @@
 #!/usr/bin/env python3
 """
 Change Static IP for Lightsail VPS automatically and update respective DNS settings
+
+Design:
+Get old static ip
+Release old static ip
+Repeat creating new static ip for X times until the new ip was not used in the past (recorded in a csv file), otherwise give up.
+Attach instance to new static ip
+Send an email if it fails at any step.
 """
 import boto3
 from datetime import datetime
@@ -59,6 +66,11 @@ rtclient = boto3.client('route53')
 def send_email(to, subject, contents):
     """  send email with gmail account defined in ~/.yagmail.
 
+    sample ~/.yagmail file:
+    [DEFAULT]
+    email=xiejiping.com
+    token=xxxxx
+
     contents: e.g. 'body content' or ['mail body content','pytest.ini','a.py']
     to: e.g. 'peter.jp.xie@gmail.com'
     
@@ -69,6 +81,7 @@ def send_email(to, subject, contents):
     
     # read password
     gmail_config = {}
+    assert os.path.exists(os.path.expanduser('~/.yagmail')), 'Please create ~/.yagmail file with email=xx and token=xxxxx'
     with open(os.path.expanduser('~/.yagmail'))as f:
         for line in f:
             if '=' in line:
@@ -107,7 +120,9 @@ def getStaticIp(vStaticIpName_,lsclient):
             log.info ( 'Attached to: ' + static_ip_response['staticIp']['attachedTo'] ) 
             return static_ip_response['staticIp']['ipAddress'] 
         else:
-            log.error('Failed to get static ip with response: %s' % static_ip_response )  
+            err = 'Failed to get static ip with API response: %s' % static_ip_response
+            log.error(err)
+            return Exception(err)
     
 # Allocate a new static IP
 def allocateStaticIp( vStaticIpName_, lsclient ):
@@ -129,7 +144,9 @@ def allocateStaticIp( vStaticIpName_, lsclient ):
             # log.info ( 'region Name: ' + allocate_static_ip_resp['operations'][0]['location']['regionName'] )
             log.info ( 'StaticIp is created: ' + allocate_static_ip_resp['operations'][0]['resourceName'] )
         else:
-            log.error('Failed to allocate static ip with response: %s' % allocate_static_ip_resp )
+            err = 'Failed to allocate static ip with response: %s' % allocate_static_ip_resp
+            log.error(err)
+            return Exception(err)
 
 # Attach a new static IP
 def attachStaticIp(vStaticIpName_, vInstanceName_, lsclient):            
@@ -152,7 +169,9 @@ def attachStaticIp(vStaticIpName_, vInstanceName_, lsclient):
             # log.info ( 'region Name: ' + allocate_static_ip_resp['operations'][0]['location']['regionName'] )
             log.info ( 'StaticIp is attached to: ' + attach_static_ip_resp['operations'][0]['operationDetails'] )
         else:
-            log.error('Failed to attach static ip with response: %s' % attach_static_ip_resp )
+            err = 'Failed to attach static ip with response: %s' % attach_static_ip_resp 
+            log.error(err)
+            return Exception(err)            
 
 # Release the old static IP
 def releaseStaticIp( vStaticIpName_, lsclient):
@@ -173,7 +192,9 @@ def releaseStaticIp( vStaticIpName_, lsclient):
             str(release_static_ip_resp['operations'][0]['status']) == 'Succeeded'):
             log.info ( 'StaticIp is released: ' + release_static_ip_resp['operations'][0]['resourceName'] )
         else:
-            log.error('Failed to release static ip with response: %s' % release_static_ip_resp )
+            err = 'Failed to release static ip with response: %s' % release_static_ip_resp 
+            log.error(err)
+            return Exception(err)             
 
 # Change DNS A record
 def changeDNS( vHostedZoneId_, vDNS_name_, vIpAddress_):    
@@ -213,7 +234,9 @@ def changeDNS( vHostedZoneId_, vDNS_name_, vIpAddress_):
             str(change_resource_record_sets_resp['ChangeInfo']['Status']) == 'PENDING'):
             log.info ( 'DNS is being updated: ' + vDNS_name_ + ' - ' + vIpAddress_ )
         else:
-            log.error('Failed to update DNS with response: %s' % change_resource_record_sets_resp )
+            err = 'Failed to update DNS with response: %s' % change_resource_record_sets_resp
+            log.error(err)
+            return Exception(err)             
 
 # List DNS A record
 def listDNS_A_record( vHostedZoneId_, vSubDomainName_):  
@@ -279,35 +302,65 @@ def main():
         vRegionName = server['region_name']
         vDNS_names = server['DNS_names']
         lsclient = boto3.client('lightsail', region_name=vRegionName)
+        status_get_static_ip = False
+        status_release_static_ip = False
+        status_allocate_static_ip = False
+        status_attach_static_ip = False
+        status_get_static_ip_after_attach = False
         change_ip_success = False # update to True once successful
         for i in range(max_retry):
             # log.info ('Time: ' + datetime.now().strftime('%Y-%m-%d %H:%M:%S'))
             log.info ('=================Attempt %s=====================' % (i+1))
             log.info ('*****Static IP before relocation:*****')
-            ret = getStaticIp(vStaticIpName,lsclient)
-            if isinstance(ret,Exception):
-                log.error('Failed to rotate IP with exception at getStaticIp.')
-                sleep(Wait_Secs_Before_Retry)
-                continue
-            ret = releaseStaticIp(vStaticIpName, lsclient)
-            if isinstance(ret,Exception):
-                log.error('Failed to rotate IP with exception at releaseStaticIp.')
-                sleep(Wait_Secs_Before_Retry)
-                continue            
+            # does repeat getStaticIp if previous attempt succeeded
+            if status_get_static_ip is False: 
+                ret = getStaticIp(vStaticIpName,lsclient)
+                if isinstance(ret,Exception):
+                    log.warning('Failed at getStaticIp. Maybe the static ip was released before or it is created the this time. '
+                                'Contine next step.')
+                    # Note: getStaticIp success is optional.
+                    # sleep(Wait_Secs_Before_Retry)
+                    # continue    
+                else:
+                    status_get_static_ip = True
+            else:
+                log.info('Skip getStaticIp in this attempt since it is successful before.')
+
+            if status_release_static_ip is False:
+                if status_get_static_ip is True:
+                    ret = releaseStaticIp(vStaticIpName, lsclient)
+                    if isinstance(ret,Exception):
+                        log.warning('Failed at releaseStaticIp. Maybe the static ip was released before or it is created the this time.')
+                        # Note: releaseStaticIp success is optional.
+                        # sleep(Wait_Secs_Before_Retry)
+                        # continue
+                    else:
+                        status_release_static_ip = True
+                else:
+                    log.warning('Skip releaseStaticIp since getStaticIp failed.')
+            else:
+                log.info('Skip releaseStaticIp in this attempt since it is successful before.')
+       
             sleep(5) # sleep to avoid previous static ip name not fully ready
             ret = allocateStaticIp(vStaticIpName, lsclient)
             if isinstance(ret,Exception):
                 log.critical('Failed to allocate static ip for %s, give up!' % vInstanceName) 
-                break                
+                break
+            else:
+                status_allocate_static_ip = True
+                sleep(2) # wait to take effect  
             ret = attachStaticIp(vStaticIpName, vInstanceName, lsclient)
             if isinstance(ret,Exception):
                 log.critical('Failed to attach static ip %s to instace %s, give up!' % (vStaticIpName,vInstanceName))
                 break
-            sleep(2) # wait to take effect
+            else:
+                status_attach_static_ip = True
+                sleep(2) # wait to take effect
+
             log.info ('****Static IP after relocation:*****')
             vStaticIP = getStaticIp(vStaticIpName, lsclient) 
             # Update respective DNS mapping
-            if (vStaticIP != None and isIpAddressExist(vIpHistoryFilename,vStaticIP) == False):
+            if (isinstance(vStaticIP,Exception) is False and isIpAddressExist(vIpHistoryFilename,vStaticIP) == False):
                 log.info('Static IP is re-allocated successfully.')
                 change_ip_success = True
                 writeIpHistoryFile(vIpHistoryFilename, vStaticIP, str(i+1))
@@ -324,7 +377,7 @@ def main():
         # fails to change ip
         if change_ip_success is False:
             # still need to update DNS if new IP is allocated but exists in the history
-            if (vStaticIP != None and isIpAddressExist(vIpHistoryFilename,vStaticIP) == True):
+            if (isinstance(vStaticIP,Exception) is False and isIpAddressExist(vIpHistoryFilename,vStaticIP) == True):
                 log.info('Static IP is re-allocated but exists in the history.')
                 for dns in vDNS_names:
                     changeDNS( vHostedZoneId, dns, vStaticIP)
