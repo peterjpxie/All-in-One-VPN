@@ -3,10 +3,12 @@
 Change Static IP for Lightsail VPS automatically and update respective DNS settings
 
 Design:
-Get old static ip
-Release old static ip
-Repeat creating new static ip for X times until the new ip was not used in the past (recorded in a csv file), otherwise give up.
-Attach instance to new static ip
+1/ Get old static ip
+2/ Release old static ip
+3/ Create new static ip and ensure the new ip was not used in the past (recorded in a csv file).
+4/ Attach instance to new static ip
+5/ Change DNS mapping to new static ip
+Repeat above steps for X times until success.
 Send an email if it fails at any step.
 """
 import boto3
