@@ -1,4 +1,4 @@
-#!/bin/sh
+#!/bin/bash
 #
 # Script for automatic setup of a VPN server on Ubuntu, supporting IPSec, L2TP, PPTP, IKEv2 and OpenVPN.
 # Tested on Digital Ocean, AWS, Lightsail cloud VMs.
@@ -52,7 +52,7 @@ echo "What do you want to do?"
 echo "   1) Install all VPN services: PPTP, IPSec, L2TP, IKEv2 and OpenVPN"
 echo "   2) Install all VPN services except OpenVPN"
 echo "   3) Exit"
-read -p "Select an option [1-3]: " option
+read -rp "Select an option [1-3]: " option
 fi
 
 #Exit if option is invalid.
@@ -63,7 +63,7 @@ esac
 
 # Use dirname path of the main script so it calls other scripts in correct path no matter where this script is executed, 
 # e.g. ./<main_script>.sh or sh /root/<main_script>.sh. 
-path_of_mainScript=`dirname $0`
+path_of_mainScript=$(dirname "$0")
 #echo path_of_mainScript $path_of_mainScript
 
 ### Install VPNs ###
@@ -71,14 +71,14 @@ path_of_mainScript=`dirname $0`
 ## pptp - insecure old school protocol
 echo "=====================Installing pptp==========================="
 echo ""
-bash ${path_of_mainScript}/pptp/setup.sh
-# sh ${path_of_mainScript}/tinyproxy/setup_tinyproxy.sh
+bash "${path_of_mainScript}"/pptp/setup.sh
+# sh "${path_of_mainScript}"/tinyproxy/setup_tinyproxy.sh
 
 ## openvpn
 if [ "$option" != "2" ] ; then
 echo "=====================Installing openvpn==========================="
 echo ""
-bash ${path_of_mainScript}/openvpn/openvpn-install.sh
+bash "${path_of_mainScript}"/openvpn/openvpn-install.sh
 fi
 
 ## IPSec, L2TP, IKEv2 with https://github.com/hwdsl2/setup-ipsec-vpn
@@ -95,24 +95,24 @@ export VPN_DNS_NAME=sanpingshui.com
 # Similarly, you may specify a name for the first IKEv2 client. The default is vpnclient if not specified.
 export VPN_CLIENT_NAME=peter
 
-bash ${path_of_mainScript}/ipsec/vpnsetup_ubuntu_latest.sh
+bash "${path_of_mainScript}"/ipsec/vpnsetup_ubuntu_latest.sh
 
 
 ### Customized Setup for my own server ###
 # Perform backup restore first, then SetVPNServer so AWS root authorized_keys is replaced with backup one. 
 
 # Check if backup files exist
-if [ -f ~/backup/chap-secrets ] && [ -f ${path_of_mainScript}/backup.sh ] ; then
+if [ -f ~/backup/chap-secrets ] && [ -f "${path_of_mainScript}"/backup.sh ] ; then
 echo "Restore backup configuration..."
-sh ${path_of_mainScript}/backup.sh -o 2
+sh "${path_of_mainScript}"/backup.sh -o 2
 fi
 
-if [ -f ${path_of_mainScript}/setVPNServer.sh ] ; then
+if [ -f "${path_of_mainScript}"/setVPNServer.sh ] ; then
 echo "Leave default for next option if you are not sure what it is."
-read -p "Do you want to configure VPN server with customised settings [y/n] (default n): " setServer_option
+read -rp "Do you want to configure VPN server with customised settings [y/n] (default n): " setServer_option
 
 case "$setServer_option" in
-  y | Y) sh ${path_of_mainScript}/setVPNServer.sh -o 0 ;;
+  y | Y) sh "${path_of_mainScript}"/setVPNServer.sh -o 0 ;;
   *) ;;
 esac
 

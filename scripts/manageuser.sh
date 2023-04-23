@@ -1,5 +1,7 @@
 #!/bin/bash
 
+exiterr()  { echo "Error: ${1}" >&2; exit 1; }
+
 printhelp() {
 echo "
 SYNOPSIS
@@ -13,6 +15,11 @@ DESCRIPTION
     -d, --delete <username> Delete user with -u username
 "
 }
+
+# Check if current user is root
+if [ "$(id -u)" != 0 ]; then
+  exiterr "Script must be run as root."
+fi
 
 addUser() {
 if [ "$1" = "" ] || [ "$2" = "" ]; then

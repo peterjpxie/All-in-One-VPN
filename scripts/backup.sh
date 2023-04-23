@@ -199,7 +199,6 @@ case $option in
   1) backup ;;
   2) restore;;
   3) check_settings;;
-  5) test_func;; 
   *) exit 0;;
 esac
 
