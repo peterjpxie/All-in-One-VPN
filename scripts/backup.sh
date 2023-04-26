@@ -22,7 +22,7 @@ DESCRIPTION
 while [ "$1" != "" ]; do
   case "$1" in
     -o    | --option )             option=$2; shift 2 ;;
-    -h    | --help  | *)           echo "$(printhelp)"; exit 0 ;;
+    -h    | --help  | *)           printhelp; exit 0 ;;
 	
   esac
 done
@@ -32,10 +32,10 @@ backup_path=~/backup
 skip_openvpn=1
 
 mv_existing_file()  { 
-if [ -f $1 ] || [ -d $1 ]; then 
+if [ -f "$1" ] || [ -d "$1" ]; then 
 # Remove first to avoid issues for folder.
-rm -rf ${1}.prev
-mv $1 ${1}.prev
+rm -rf "${1}".prev
+mv "$1" "${1}".prev
 fi
 }
 
@@ -102,6 +102,8 @@ echo "Backup successfully at $backup_path for the following:
 }
 
 restore(){
+if -d "$backup_path"; then
+
 # chap-secrets
 cp --backup $chap_secrets_bk_fullname /etc/ppp/chap-secrets
 
@@ -150,6 +152,7 @@ Note:
 /etc/rc.local and ~/.bashrc are not touched. Please review and revise manually. 
 Please also review restored crontab at /var/spool/cron/crontabs/root or 'crontab -l'.
 "
+fi # outer most if
 
 }
 
@@ -166,7 +169,7 @@ for i in $fileList
 do
 echo "cat $i:"
 echo "======================================================"
-cat $i
+cat "$i"
 echo ""
 done 
 
@@ -177,17 +180,13 @@ fi
 
 }
 
-test_func() {
-echo "Test"
-}
-
 if [ "$option" = "" ]; then
 echo "What do you want to do?"
 echo "   1) Backup"
 echo "   2) Restore"
 echo "   3) Check Settings"
 echo "   4) Exit"
-read -p "Select an option [1-4]: " option
+read -rp "Select an option [1-4]: " option
 fi
 
 case $option in
