@@ -39,13 +39,6 @@ mv $1 ${1}.prev
 fi
 }
 
-# Obsolete function. Use cp --backup directly.
-# cp_existing_file()  { 
-# if [ -f $1 ]; then 
-# cp $1 ${1}.prev
-# fi
-# }
-
 # Backup filenames
 # chap-secrets
 chap_secrets_bk_fullname="$backup_path/chap-secrets"
@@ -65,6 +58,8 @@ authorized_keys_bk_fullname="$backup_path/authorized_keys"
 rc_local_bk_fullname="$backup_path/rc_local"
 
 backup() {
+mkdir -p "$backup_path"
+
 # chap-secrets
 cp --backup /etc/ppp/chap-secrets $chap_secrets_bk_fullname
 
