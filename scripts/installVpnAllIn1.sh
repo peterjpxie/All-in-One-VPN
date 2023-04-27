@@ -138,6 +138,7 @@ fi
 echo "===============================================================================
 Congrats! VPN servers are ready.
 PSK (IPSec / L2TP): ${VPN_IPSEC_PSK}
+Pre-created VPN user / password: ${VPN_USER} / ${VPN_PASSWORD}
 IKEv2 server DNS name: ${VPN_DNS_NAME}
 IKEv2 client profiles:
   ~/peter.p12 (for Windows & Linux)
