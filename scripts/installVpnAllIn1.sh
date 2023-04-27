@@ -91,7 +91,8 @@ export VPN_PASSWORD=peter
 
 # IKEv2 settings:
 #Advanced users can optionally specify a DNS name for the IKEv2 server address. The DNS name must be a fully qualified domain name (FQDN). Example:
-export VPN_DNS_NAME=sanpingshui.com
+read -rp "Enter DNS name of your VPN server (e.g., sanpingshui.com): " server_dns
+export VPN_DNS_NAME="${server_dns}"
 # Similarly, you may specify a name for the first IKEv2 client. The default is vpnclient if not specified.
 export VPN_CLIENT_NAME=peter
 
@@ -123,7 +124,7 @@ fi
 echo "===============================================================================
 Congrats! VPN servers are ready.
 PSK (IPSec / L2TP): ${VPN_IPSEC_PSK}
-IKEv2 server DNS name: ${VPN_DNS_NAME} - Hardcoded in script
+IKEv2 server DNS name: ${VPN_DNS_NAME}
 IKEv2 client profiles:
   ~/peter.p12 (for Windows & Linux)
   ~/peter.sswan (for Android)
