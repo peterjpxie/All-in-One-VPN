@@ -71,14 +71,20 @@ path_of_mainScript=$(dirname "$0")
 ## pptp - insecure old school protocol
 echo "=====================Installing pptp==========================="
 echo ""
+(
+  set -x
 bash "${path_of_mainScript}"/pptp/setup.sh
+)
 # sh "${path_of_mainScript}"/tinyproxy/setup_tinyproxy.sh
 
 ## openvpn
 if [ "$option" != "2" ] ; then
 echo "=====================Installing openvpn==========================="
 echo ""
+(
+  set -x
 bash "${path_of_mainScript}"/openvpn/openvpn-install.sh
+)
 fi
 
 ## IPSec, L2TP, IKEv2 with https://github.com/hwdsl2/setup-ipsec-vpn
@@ -96,16 +102,24 @@ export VPN_DNS_NAME="${server_dns}"
 # Similarly, you may specify a name for the first IKEv2 client. The default is vpnclient if not specified.
 export VPN_CLIENT_NAME=peter
 
+(
+  set -x
 bash "${path_of_mainScript}"/ipsec/vpnsetup_ubuntu_latest.sh
-
+)
 
 ### Customized Setup for my own server ###
 # Perform backup restore first, then SetVPNServer so AWS root authorized_keys is replaced with backup one. 
 
 # Check if backup files exist
 if [ -f ~/backup/chap-secrets ] && [ -f "${path_of_mainScript}"/backup.sh ] ; then
-echo "Restore backup configuration..."
-sh "${path_of_mainScript}"/backup.sh -o 2
+  read -rp "Found backup VPN config files, do you want to restore from ~/backup [y/n] (default n): " restore_option
+  if [ "${restore_option}" = "y" ]; then
+    echo "Restore backup configuration..."
+    (
+      set -x
+    sh "${path_of_mainScript}"/backup.sh -o 2
+    )
+  fi
 fi
 
 if [ -f "${path_of_mainScript}"/setVPNServer.sh ] ; then

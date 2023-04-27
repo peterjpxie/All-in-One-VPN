@@ -102,7 +102,7 @@ echo "Backup successfully at $backup_path for the following:
 }
 
 restore(){
-if -d "$backup_path"; then
+if [ -d "$backup_path" ] ; then
 
 # chap-secrets
 cp --backup $chap_secrets_bk_fullname /etc/ppp/chap-secrets
