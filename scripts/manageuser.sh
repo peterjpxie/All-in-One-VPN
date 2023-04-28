@@ -126,7 +126,7 @@ case $option in
   read -p "Select one user to delete [1-$matched_lines]:" username_no
   fi
   full_username=`grep $username /etc/ppp/chap-secrets | grep -v "^#" | cut -f 1 -d " " | sed -n "$username_no"p`
-  deleteUser $full_username
+  deleteUser "$full_username"
 #  echo "Deleting user $full_username ..."
 #  sed -i "/^$full_username/d" /etc/ppp/chap-secrets
 #  sed -i "/^$full_username/d" /etc/ipsec.d/passwd
