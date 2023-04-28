@@ -11,8 +11,8 @@ DESCRIPTION
     Manage VPN users. If no options specified, it will prompt the options to users.
 
 [OPTIONS]	
-    -a, --add    <username> Add user with -u username and -p password
-    -d, --delete <username> Delete user with -u username
+    -a, --add     Add user with -u username and -p password
+    -d, --delete  Delete user with -u username
 "
 }
 
@@ -35,7 +35,7 @@ echo "$username * $passwd *" >>/etc/ppp/chap-secrets
 echo "$username:$(openssl passwd -1 $passwd):xauth-psk" >>/etc/ipsec.d/passwd
 # read -p "Push new account to backup SG server? Y/N: " -e -i Y pushToBackup
 # copy to backup server if defined.
-if [ ! -z "$BackupSvr" ] ; then
+if [ -n "$BackupSvr" ] ; then
 sh ~/All-in-One-VPN/scripts/pushVpnAcctToBakSvr.sh $BackupSvr
 fi
 
