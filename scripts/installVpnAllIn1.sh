@@ -93,7 +93,8 @@ echo ""
 # IPSec, L2TP settings:
 export VPN_IPSEC_PSK=petersvpn
 export VPN_USER=peter
-export VPN_PASSWORD=peter
+read -rp "Enter password for sample vpn user peter: " sample_user_vpn_password
+export VPN_PASSWORD="${sample_user_vpn_password}"
 
 # IKEv2 settings:
 #Advanced users can optionally specify a DNS name for the IKEv2 server address. The DNS name must be a fully qualified domain name (FQDN). Example:
@@ -138,7 +139,7 @@ fi
 echo "===============================================================================
 Congrats! VPN servers are ready.
 PSK (IPSec / L2TP): ${VPN_IPSEC_PSK}
-Pre-created VPN user / password: ${VPN_USER} / ${VPN_PASSWORD}
+Pre-created sample VPN user: ${VPN_USER}
 IKEv2 server DNS name: ${VPN_DNS_NAME}
 IKEv2 client profiles:
   ~/peter.p12 (for Windows & Linux)
