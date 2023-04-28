@@ -49,8 +49,11 @@ fi
 username=$1
 
 echo "Deleting user $username ..."
+# it could be (peter * passwd *) or ()"peter" * "passwd" *)
 sed -i "/^$username/d" /etc/ppp/chap-secrets
+sed -i "/^\"$username/d" /etc/ppp/chap-secrets
 sed -i "/^$username/d" /etc/ipsec.d/passwd
+sed -i "/^\"$username/d" /etc/ipsec.d/passwd
 }
 
 option=""
