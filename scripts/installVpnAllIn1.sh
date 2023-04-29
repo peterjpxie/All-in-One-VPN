@@ -160,4 +160,6 @@ IKEv2 client profiles:
 
 To create VPN users for PPTP, IPSec, L2TP, run ./manageuser.sh.
 To create VPN client profiles for OpenVPN, run ./openvpn/openvpn-install.sh.
+To rotate server ip, check aws_vps_robot folder for more details and add this line to crontab:
+10 3 * * * python3 ~/All-in-One-VPN/aws_vps_robot/pybot/changeStaticIP.py
 ==============================================================================="
