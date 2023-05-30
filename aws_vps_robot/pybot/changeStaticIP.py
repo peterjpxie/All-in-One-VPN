@@ -31,7 +31,7 @@ Wait_Secs_Before_Retry = 2
 # New Application Parameters 
 vpn_servers = [
     {
-        'instance_name': 'Ubuntu-1', 
+        'instance_name': 'Ubuntu-2', 
         'static_ip_name': 'StaticIp-AU-Auto', 
         'DNS_names': ['sanpingshui.com'],
         'region_name': 'ap-southeast-2'
