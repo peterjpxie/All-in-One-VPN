@@ -75,7 +75,7 @@ echo "=====================Installing pptp==========================="
 echo ""
 (
 set -x
-# bash "${path_of_mainScript}"/pptp/setup.sh
+bash "${path_of_mainScript}"/pptp/setup.sh -u "$vpn_username" -p "$vpn_password"
 )
 # sh "${path_of_mainScript}"/tinyproxy/setup_tinyproxy.sh
 
@@ -97,8 +97,8 @@ export VPN_IPSEC_PSK=petersvpn
 # Note:
 #   It will create ("$VPN_USER" l2tpd "$VPN_PASSWORD" *) 
 #   in /etc/ppp/chap-secrets, which works only for IPSec, L2TP, BUT not PPTP.
-#   Use manageuser.sh to re-create ("$VPN_USER" * "$VPN_PASSWORD" *) for both PPTP and IPSec, L2TP.
-export VPN_USER="$vpn_username"
+#   Use manageuser.sh to create ("$VPN_USER" * "$VPN_PASSWORD" *) for both PPTP and IPSec, L2TP.
+export VPN_USER="$vpn_username" # "demo"
 export VPN_PASSWORD="${vpn_password}"
 
 # IKEv2 settings:
@@ -106,7 +106,7 @@ export VPN_PASSWORD="${vpn_password}"
 read -rp "Enter DNS name of your VPN server (e.g., sanpingshui.com): " server_dns
 export VPN_DNS_NAME="${server_dns}"
 # Similarly, you may specify a name for the first IKEv2 client. The default is vpnclient if not specified.
-export VPN_CLIENT_NAME=peter
+export VPN_CLIENT_NAME="$vpn_username"
 
 (
 set -x
@@ -140,15 +140,16 @@ esac
 
 fi
 
-echo "=========================Create default VPN user for PPTP, IPSec, L2TP=============================="
-# read -rp "Enter vpn username: " vpn_username
-# read -rp "Enter vpn password: " vpn_password
-(
-set -x
-# remove the user created by ipsec setup script first as it only works for ipsec, not pptp
-bash ./manageuser.sh -d -u "${vpn_username}"
-bash ./manageuser.sh -a -u "${vpn_username}" -p "${vpn_password}"
-)
+# No need
+# echo "=========================Create default VPN user for PPTP, IPSec, L2TP=============================="
+# # read -rp "Enter vpn username: " vpn_username
+# # read -rp "Enter vpn password: " vpn_password
+# (
+# set -x
+# # remove the user created by ipsec setup script first as it only works for ipsec, not pptp
+# # bash ./manageuser.sh -d -u "${vpn_username}"
+# bash ./manageuser.sh -a -u "${vpn_username}" -p "${vpn_password}"
+# )
 
 # User management
 #tinyproxy_port=$(egrep "^Port " /etc/tinyproxy.conf |awk '{print $2}')
@@ -158,9 +159,9 @@ Sample VPN username / password (PPTP / IPSec / L2TP): ${vpn_username} / ${vpn_pa
 PSK (IPSec / L2TP): ${VPN_IPSEC_PSK}
 IKEv2 server DNS name: ${VPN_DNS_NAME}
 IKEv2 client profiles:
-  ~/peter.p12 (for Windows & Linux)
-  ~/peter.sswan (for Android)
-  ~/peter.mobileconfig (for iOS & macOS)
+  ~/${vpn_username}.p12 (for Windows & Linux)
+  ~/${vpn_username}.sswan (for Android)
+  ~/${vpn_username}.mobileconfig (for iOS & macOS)
 
 To create VPN users for PPTP, IPSec, L2TP, run ./manageuser.sh.
 To create VPN client profiles for OpenVPN, run ./openvpn/openvpn-install.sh.
