@@ -67,13 +67,15 @@ path_of_mainScript=$(dirname "$0")
 #echo path_of_mainScript $path_of_mainScript
 
 ### Install VPNs ###
+read -rp "Enter vpn username: " vpn_username
+read -rp "Enter vpn password: " vpn_password
 
 ## pptp - insecure old school protocol
 echo "=====================Installing pptp==========================="
 echo ""
 (
-  set -x
-bash "${path_of_mainScript}"/pptp/setup.sh
+set -x
+# bash "${path_of_mainScript}"/pptp/setup.sh
 )
 # sh "${path_of_mainScript}"/tinyproxy/setup_tinyproxy.sh
 
@@ -93,12 +95,11 @@ echo ""
 # IPSec, L2TP settings:
 export VPN_IPSEC_PSK=petersvpn
 # Note:
-#   Don't set VPN_USER, VPN_PASSWORD for IPSec, L2TP as it will create ("$VPN_USER" l2tpd "$VPN_PASSWORD" *) 
+#   It will create ("$VPN_USER" l2tpd "$VPN_PASSWORD" *) 
 #   in /etc/ppp/chap-secrets, which works only for IPSec, L2TP, BUT not PPTP.
-#   Use manageuser.sh to create ("$VPN_USER" * "$VPN_PASSWORD" *) for both PPTP and IPSec, L2TP.
-# export VPN_USER=peter
-# read -rp "Enter password for sample vpn user peter: " sample_user_vpn_password
-# export VPN_PASSWORD="${sample_user_vpn_password}"
+#   Use manageuser.sh to re-create ("$VPN_USER" * "$VPN_PASSWORD" *) for both PPTP and IPSec, L2TP.
+export VPN_USER="$vpn_username"
+export VPN_PASSWORD="${vpn_password}"
 
 # IKEv2 settings:
 #Advanced users can optionally specify a DNS name for the IKEv2 server address. The DNS name must be a fully qualified domain name (FQDN). Example:
@@ -108,9 +109,10 @@ export VPN_DNS_NAME="${server_dns}"
 export VPN_CLIENT_NAME=peter
 
 (
-  set -x
-bash "${path_of_mainScript}"/ipsec/vpnsetup_ubuntu_latest.sh
+set -x
+bash "${path_of_mainScript}"/ipsec/vpn.sh || exiterr "Failed to install IPSec/L2TP VPN. Aborting the install..."
 )
+
 
 ### Customized Setup for my own server ###
 # Perform backup restore first, then SetVPNServer so AWS root authorized_keys is replaced with backup one. 
@@ -139,10 +141,12 @@ esac
 fi
 
 echo "=========================Create default VPN user for PPTP, IPSec, L2TP=============================="
-read -rp "Enter vpn username: " vpn_username
-read -rp "Enter vpn password: " vpn_password
+# read -rp "Enter vpn username: " vpn_username
+# read -rp "Enter vpn password: " vpn_password
 (
-  set -x
+set -x
+# remove the user created by ipsec setup script first as it only works for ipsec, not pptp
+bash ./manageuser.sh -d -u "${vpn_username}"
 bash ./manageuser.sh -a -u "${vpn_username}" -p "${vpn_password}"
 )
 
