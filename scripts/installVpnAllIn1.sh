@@ -110,6 +110,7 @@ export VPN_CLIENT_NAME="$vpn_username"
 
 (
 set -x
+# Note: Latest vpn.sh(2023/7/1) did not work on my ubuntu 20.04.
 # bash "${path_of_mainScript}"/ipsec/vpn.sh || exiterr "Failed to install IPSec/L2TP VPN. Aborting the install..."
 bash "${path_of_mainScript}"/ipsec/vpnsetup_ubuntu_latest.sh || exiterr "Failed to install IPSec/L2TP VPN. Aborting the install..."
 )

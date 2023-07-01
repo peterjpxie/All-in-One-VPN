@@ -102,7 +102,7 @@ fi
 LEN=$(echo ${#PASS})
 
 # if [ -z "$PASS" ] || [ $LEN -lt 8 ] || [ -z "$NAME"]
-if [ -z "$PASS" ] || [ -z "$NAME"]
+if [ -z "$PASS" ] || [ -z "$NAME" ]
 then
    P1=`cat /dev/urandom | tr -cd abcdefghjkmnpqrstuvwxyzABCDEFGHJKLMNPQRSTUVWXYZ23456789 | head -c 3`
    P2=`cat /dev/urandom | tr -cd abcdefghjkmnpqrstuvwxyzABCDEFGHJKLMNPQRSTUVWXYZ23456789 | head -c 3`
