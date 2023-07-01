@@ -70,14 +70,6 @@ path_of_mainScript=$(dirname "$0")
 read -rp "Enter vpn username: " vpn_username
 read -rp "Enter vpn password: " vpn_password
 
-## pptp - insecure old school protocol
-echo "=====================Installing pptp==========================="
-echo ""
-(
-set -x
-bash "${path_of_mainScript}"/pptp/setup.sh -u "$vpn_username" -p "$vpn_password"
-)
-# sh "${path_of_mainScript}"/tinyproxy/setup_tinyproxy.sh
 
 ## openvpn
 if [ "$option" != "2" ] ; then
@@ -115,6 +107,16 @@ set -x
 bash "${path_of_mainScript}"/ipsec/vpnsetup_ubuntu_latest.sh || exiterr "Failed to install IPSec/L2TP VPN. Aborting the install..."
 )
 
+# Note: Install L2TP first as the latest vpn.sh will overwrite instead append /etc/ppp/chap-secrets,
+#       while pptp is under my control to append /etc/ppp/chap-secrets.       
+## pptp - insecure old school protocol
+echo "=====================Installing pptp==========================="
+echo ""
+(
+set -x
+bash "${path_of_mainScript}"/pptp/setup.sh -u "$vpn_username" -p "$vpn_password"
+)
+# sh "${path_of_mainScript}"/tinyproxy/setup_tinyproxy.sh
 
 ### Customized Setup for my own server ###
 # Perform backup restore first, then SetVPNServer so AWS root authorized_keys is replaced with backup one. 
