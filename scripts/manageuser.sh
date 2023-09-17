@@ -97,12 +97,6 @@ case $option in
   fi
   read -p "Enter password:" -e -i $username passwd
   addUser $username $passwd
-#  echo "$username * $passwd *" >>/etc/ppp/chap-secrets
-#  echo "$username:$(openssl passwd -1 $passwd):xauth-psk" >>/etc/ipsec.d/passwd
-#  read -p "Push new account to backup SG server? Y/N: " -e -i Y pushToBackup
-#  if [ $pushToBackup = 'Y' ] ; then
-#  sh ~/All-in-One-VPN/scripts/pushVpnAcctToSG.sh
-#  fi
   ;;
 2) 
   read -p "Enter username or keyword:" username
@@ -127,9 +121,6 @@ case $option in
   fi
   full_username=`grep $username /etc/ppp/chap-secrets | grep -v "^#" | cut -f 1 -d " " | sed -n "$username_no"p`
   deleteUser "$full_username"
-#  echo "Deleting user $full_username ..."
-#  sed -i "/^$full_username/d" /etc/ppp/chap-secrets
-#  sed -i "/^$full_username/d" /etc/ipsec.d/passwd
   ;;
 *) 
   echo "Invalid option. Exiting..."
